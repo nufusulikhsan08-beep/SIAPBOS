@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <script>
+    // Pembersih otomatis data lama saat reset
+    (function () {
+      const RESET_VERSION = 'v_reset_clean_1';
+      if (localStorage.getItem('SPMU_RESET_APPLIED') !== RESET_VERSION) {
+        try {
+          localStorage.clear();
+          if (window.indexedDB) {
+            window.indexedDB.deleteDatabase('SPMU_OTOMATIS_PROJECTS');
+          }
+          localStorage.setItem('SPMU_RESET_APPLIED', RESET_VERSION);
+          console.log('✓ Local storage & IndexedDB lama berhasil dibersihkan total.');
+        } catch (e) { }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SIAP BOS — Pengelolaan BOSP &amp; ARKAS</title>
+  <link rel="icon" type="image/png" href="assets/SIAP_BOS_LOGO.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- ============================================================
+     LAYAR LOGIN NPSN — SIAP BOS
+     Sistem Informasi Akuntansi & Pengelolaan BOSP (SIAP BOS)
+     ============================================================ -->
+  <div id="npsn-lock-screen" class="gov-auth-overlay">
+    <div class="gov-auth-card">
+      <!-- Institutional Emblem Header -->
+      <div class="gov-auth-emblems">
+        <div class="gov-brand-icon-wrap" title="SIAP BOS">
+          <img src="assets/SIAP_BOS_LOGO.png" alt="Logo SIAP BOS" class="gov-emblem-img"
+            style="width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 6px 18px rgba(37,99,235,0.45));">
+        </div>
+      </div>
+
+      <div class="gov-auth-header-copy">
+        <div class="gov-inst-badge">
+          <span class="gov-inst-dot"></span>
+          <span>SISTEM PENGELOLAAN BOSP</span>
+        </div>
+        <h1 class="gov-app-title">SIAP BOS</h1>
+        <p class="gov-app-subtitle">Sistem Informasi Akuntansi &amp; Pengelolaan BOSP</p>
+        <div class="gov-app-meta">Tahun Anggaran 2026 &bull; Terintegrasi ARKAS</div>
+      </div>
+
+      <!-- Authentication Form -->
+      <div class="gov-form-block">
+        <div class="gov-input-head">
+          <label for="npsn-input" class="gov-input-label">
+            <svg class="gov-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+              <line x1="7" y1="8" x2="17" y2="8"></line>
+              <line x1="7" y1="12" x2="13" y2="12"></line>
+            </svg>
+            <span>Nomor Pokok Sekolah Nasional (NPSN)</span>
+          </label>
+          <span class="gov-code-badge">8 DIGIT</span>
+        </div>
+
+        <div class="gov-input-wrap">
+          <input id="npsn-input" type="text" maxlength="10" placeholder="Masukkan 8 Digit NPSN..." autocomplete="off"
+            inputmode="numeric" class="gov-npsn-field" spellcheck="false">
+          <div class="gov-input-icon-hint" title="Sistem terverifikasi">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Preview nama sekolah saat NPSN valid terdeteksi -->
+        <div id="npsn-school-preview" class="gov-school-preview" style="display:none;">
+          <div class="gov-preview-head">
+            <span class="gov-preview-check">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <span class="gov-preview-status">Satuan Pendidikan Terverifikasi</span>
+          </div>
+          <div id="npsn-school-name" class="gov-preview-name"></div>
+          <div id="npsn-school-kec" class="gov-preview-kec"></div>
+        </div>
+
+        <!-- Notifikasi Error -->
+        <div id="npsn-error" class="gov-auth-error" style="display:none;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="npsn-error-text">NPSN tidak valid. Masukkan 8 digit NPSN sekolah.</span>
+        </div>
+
+        <button id="npsn-login-btn" onclick="doNpsnLogin()" class="gov-auth-submit" type="button">
+          <span class="btn-text">Masuk ke Ruang Kerja BKU</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+
+        <div class="gov-auth-links">
+          <a href="monitoring/index.html" class="gov-alt-portal">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>Panel Admin SIAP BOS</span>
+            <span class="gov-link-arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Trust & Security Seal -->
+      <div class="gov-auth-trust-footer">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Sesi Lokal Terisolasi &bull; Data Terpartisi Aman Berdasarkan NPSN</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="workspace-shell">
+      <aside class="app-sidebar" id="appSidebar">
+        <div class="sidebar-collapsed-title" aria-hidden="true">
+          <span>SIAP BOS</span>
+        </div>
+        <div class="sidebar-head">
+          <div class="sidebar-brand">SIAP BOS</div>
+          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Sembunyikan sidebar"
+            aria-expanded="true" title="Buka/tutup sidebar">
+            <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS — tombol buka/tutup sidebar">
+          </button>
+        </div>
+        <div class="sidebar-label">NAVIGASI UTAMA</div>
+        <nav class="sidebar-nav" role="tablist" aria-label="Modul aplikasi">
+          <button id="tabDashboardBtn" class="side-btn active" type="button" role="tab" aria-selected="true">
+            <span class="side-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            </span>
+            <span>Dashboard</span>
+          </button>
+          <button id="tabBkuBtn" class="side-btn" type="button" role="tab" aria-selected="false">
+            <span class="side-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </span>
+            <span>Ekstraksi BKU</span>
+          </button>
+          <button id="tabSuratBtn" class="side-btn locked" type="button" role="tab" aria-selected="false" disabled>
+            <span class="side-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </span>
+            <span>Surat Perintah</span>
+          </button>
+          <button id="tabPajakBtn" class="side-btn locked" type="button" role="tab" aria-selected="false" disabled>
+            <span class="side-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="5" x2="5" y2="19"></line>
+                <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                <circle cx="17.5" cy="17.5" r="2.5"></circle>
+              </svg>
+            </span>
+            <span>Hitung Pajak</span>
+          </button>
+        </nav>
+        <div class="sidebar-label" style="margin-top:16px;">PUSAT AUDIT &amp; KONTROL</div>
+        <nav class="sidebar-nav" aria-label="Modul Terkait">
+          <a href="monitoring/index.html" class="side-btn side-btn-mon" style="text-decoration:none;"
+            title="Panel Admin SIAP BOS">
+            <span class="side-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <span>Panel Admin</span>
+          </a>
+        </nav>
+        <div class="sidebar-foot"
+          style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:2px;">
+          <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS"
+            style="width:22px; height:22px; object-fit:contain; margin-bottom:2px; opacity:0.9;">
+          <strong>SIAP BOS</strong>
+          <small>Aplikasi BOSP v3.0</small>
+        </div>
+      </aside>
+      <main class="workspace-main">
+        <div class="workspace-topbar">
+          <div class="topbar-context" style="display:flex; align-items:center; gap:8px;">
+            <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS" style="width:22px; height:22px; object-fit:contain;">
+            <span class="topbar-dot"></span>
+            <span id="topbarSectionName">Dashboard</span>
+          </div>
+          <div class="topbar-actions">
+            <button id="topbarProfileBtn" class="profile-trigger" type="button" aria-haspopup="dialog"
+              aria-expanded="false" title="Buka profil &amp; pengaturan sekolah">
+              <span class="profile-trigger-avatar" id="profileTriggerAvatar">SB</span>
+              <span class="profile-trigger-copy">
+                <b id="profileTriggerName">Profil Sekolah</b>
+                <small id="profileTriggerMeta">Pengaturan dokumen</small>
+              </span>
+              <span class="profile-trigger-chevron">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+            </button>
+            <button onclick="window.logoutNpsn && window.logoutNpsn()" type="button" id="btnGantiAkun"
+              class="topbar-logout-btn" title="Keluar / Ganti Akun NPSN">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Ganti Akun</span>
+            </button>
+          </div>
+        </div>
+        <div id="tabDashboard" class="tab-panel active dashboard-group" role="tabpanel">
+          <section class="card hero">
+            <div class="top">
+              <div style="display:flex; gap:16px; align-items:flex-start;">
+                <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS"
+                  style="width:64px; height:64px; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(37,99,235,0.3)); flex-shrink:0; margin-top:4px;">
+                <div>
+                  <div class="eyebrow">ARKAS &bull; FINANCIAL DOCUMENT AUTOMATION</div>
+                  <h1 class="title">Sistem Informasi Akuntansi &amp; Pengelolaan BOSP</h1>
+                  <div class="muted">Ekstrak &amp; verifikasi BKU otomatis, terbitkan Surat Perintah Mengeluarkan Uang
+                    (SPMU), cetak Kwitansi terstandar, dan audit pemotongan pajak sekolah dalam satu alur kerja terpadu.
+                  </div>
+                  <div class="creator">Dikembangkan untuk Satuan Pendidikan</div>
+                </div>
+              </div>
+              <span class="badge">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                PORTABLE &bull; DATABASE TERINTEGRASI
+              </span>
+            </div>
+            <div class="steps">
+              <span class="step"><i class="step-num">1</i> Pilih Berkas BKU</span>
+              <span class="step"><i class="step-num">2</i> Ekstrak &amp; Validasi</span>
+              <span class="step"><i class="step-num">3</i> Verifikasi Data</span>
+              <span class="step"><i class="step-num">4</i> SPMU &amp; Kwitansi</span>
+              <span class="step"><i class="step-num">5</i> Cetak Fisik A4 / PDF</span>
+            </div>
+          </section>
+          <section class="dx-head">
+            <div>
+              <div class="dx-eyebrow"><span class="dx-live"></span>RINGKASAN PEKERJAAN TERSIMPAN</div>
+              <h2>Dashboard</h2>
+              <p>Rekap otomatis dari seluruh SPMU yang sudah disimpan di Tab SURAT PERINTAH.</p>
+            </div>
+            <div class="dx-head-actions"><span class="dx-updated" id="dashUpdated"></span><button
+                id="dashboardRefreshBtn" class="dx-refresh" type="button"><svg viewBox="0 0 24 24" width="20"
+                  height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+                  <path d="M21 3v6h-6" />
+                </svg><span>Refresh</span></button></div>
+          </section>
+          <section class="dashboard-commandbar">
+            <div class="dashboard-quick-actions">
+              <button type="button" class="command-btn" id="dashGoBku">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"
+                  style="vertical-align:middle;margin-right:4px;">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Baca BKU</span>
+              </button>
+              <button type="button" class="command-btn" id="dashGoSurat">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:4px;">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>Surat Perintah</span>
+              </button>
+              <button type="button" class="command-btn" id="dashGoPajak">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:4px;">
+                  <line x1="19" y1="5" x2="5" y2="19"></line>
+                  <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                  <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                </svg>
+                <span>Hitung Pajak</span>
+              </button>
+              <span class="command-label"
+                style="margin-left:10px; border-left:1px solid #cbd5e1; padding-left:10px;">Filter Bulan:</span>
+              <div id="dashProjectChips" class="dash-project-chips"
+                style="display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap;"></div>
+            </div>
+            <div class="dashboard-filter">
+              <label for="dashCategoryFilter">Filter kategori</label>
+              <select id="dashCategoryFilter" aria-label="Filter kategori dashboard">
+                <option value="all">Semua kategori</option>
+                <option value="Belanja Modal : Peralatan dan Mesin">Modal — Peralatan &amp; Mesin</option>
+                <option value="Belanja Modal : Aset Tetap Lainya">Modal — Aset Tetap Lainnya</option>
+                <option value="Belanja Operasional : Barang dan Jasa">Operasional — Barang &amp; Jasa</option>
+                <option value="Belanja Operasional : Pegawai">Operasional — Pegawai</option>
+              </select>
+            </div>
+          </section>
+          <section class="dx-kpis">
+            <article class="dx-kpi k-count">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 3v5h5M9 13h6M9 17h6" />
+                </svg></div><span>Total SPMU Tersimpan</span><b id="dashProjectCount">0</b><small
+                id="dashProjectHint">Belum ada data</small>
+            </article>
+            <article class="dx-kpi k-modal">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />
+                </svg></div><span>Belanja Modal</span><b id="dashModalTotal">Rp 0</b><small id="dashModalPct">0% dari
+                total</small>
+            </article>
+            <article class="dx-kpi k-oper">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="7" width="18" height="13" rx="2" />
+                  <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" />
+                </svg></div><span>Belanja Operasional</span><b id="dashOperasionalTotal">Rp 0</b><small
+                id="dashOperPct">0% dari total</small>
+            </article>
+            <article class="dx-kpi k-pajak">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 5 5 19" />
+                  <circle cx="7" cy="7" r="2.5" />
+                  <circle cx="17" cy="17" r="2.5" />
+                </svg></div><span>Jumlah Pajak (Akumulasi BKU)</span><b id="dashTaxTotal">Rp 0</b><small
+                id="dashTaxDetail">Akumulasi dari 0 BKU tersimpan • SIPLah Rp 0 • Non SIPLah Rp 0</small>
+            </article>
+          </section>
+          <section class="dx-row">
+            <div class="card dash-composition-card dx-donut-card">
+              <div class="section-title">Komposisi Belanja</div>
+              <div class="section-sub">Porsi tiap kategori terhadap total pengeluaran SPMU tersimpan.</div>
+              <div id="dashComposition"></div>
+            </div>
+            <div class="card dx-tax-recap-card">
+              <div class="section-title">Rekap Pajak</div>
+              <div class="section-sub">Akumulasi pajak dari seluruh BKU tersimpan.</div>
+              <div class="dx-tax-recap">
+                <div class="dx-tax-box dx-tax-siplah"><span>Jumlah Pajak Siplah</span><b id="dashTaxSiplah">Rp
+                    0</b><small>Transaksi SIPLah</small></div>
+                <div class="dx-tax-box dx-tax-nonsiplah"><span>Jumlah Pajak Non-Siplah</span><b id="dashTaxNonSiplah">Rp
+                    0</b><small>Transaksi Non-SIPLah</small></div>
+              </div>
+            </div>
+          </section>
+          <section class="card dashboard-view-controls">
+            <div>
+              <div class="section-title">Kategori Belanja</div>
+              <div class="section-sub">Pilih tampilan grafik dinamis atau rekap angka per kategori.</div>
+            </div>
+            <div class="view-switch" role="group" aria-label="Tampilan kategori belanja"><button type="button"
+                class="view-switch-btn active" data-view="chart">▥ Grafik</button><button type="button"
+                class="view-switch-btn" data-view="data">▤ Data</button></div>
+          </section>
+          <section id="categoryChartView" class="dashboard-grid">
+            <div class="card chart-card">
+              <div class="toolbar">
+                <div>
+                  <div class="section-title">Belanja Modal</div>
+                  <div class="section-sub">Peralatan dan Mesin • Aset Tetap Lainnya</div>
+                </div>
+              </div>
+              <div class="bar-chart" id="chartModal"></div>
+            </div>
+            <div class="card chart-card">
+              <div class="toolbar">
+                <div>
+                  <div class="section-title">Belanja Operasional</div>
+                  <div class="section-sub">Barang dan Jasa • Pegawai</div>
+                </div>
+              </div>
+              <div class="bar-chart" id="chartOperasional"></div>
+            </div>
+          </section>
+          <section id="categoryDataView" class="card dashboard-category-data" hidden>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kategori Belanja</th>
+                    <th class="num">Jumlah (Rp)</th>
+                    <th class="num">Proporsi</th>
+                  </tr>
+                </thead>
+                <tbody id="categoryDataBody"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="card dashboard-detail">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Rekap Tersimpan</div>
+                <div class="section-sub">Pantau pekerjaan, tujuan pembayaran, kategori, waktu penyimpanan, dan nilai
+                  setiap SPMU. Gunakan pencarian untuk menemukan data tersimpan.</div>
+              </div><input id="dashSearch" class="search" type="search"
+                placeholder="Cari pekerjaan / pembayaran / kategori / no. bukti…" aria-label="Cari rekap">
+            </div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Pekerjaan</th>
+                    <th>Untuk Pembayaran</th>
+                    <th>Kategori</th>
+                    <th>Tanggal Simpan</th>
+                    <th class="num">Nilai Pengeluaran</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardTableBody">
+                  <tr>
+                    <td colspan="6" class="empty">Belum ada pekerjaan tersimpan.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div id="profileModal" class="profile-modal" aria-hidden="true">
+          <div class="profile-modal-backdrop" data-profile-close="true"></div>
+          <section class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+            <header class="profile-modal-head">
+              <div class="profile-modal-heading">
+                <div class="profile-avatar-large" id="profileAvatarLarge">SB</div>
+                <div>
+                  <div class="dx-eyebrow"><span class="dx-live"></span>PROFIL SEKOLAH</div>
+                  <h2 id="profileModalTitle">Profil &amp; Pengaturan</h2>
+                  <p>Identitas sekolah dan pengaturan dokumen yang dipakai otomatis pada Surat Perintah dan Kwitansi.
+                  </p>
+                </div>
+              </div>
+              <button id="profileModalClose" class="profile-modal-close" type="button" aria-label="Tutup profil"
+                style="position: absolute; right: 24px; top: 24px; cursor: pointer; z-index: 10;">×</button>
+            </header>
+            <div class="profile-modal-status">
+              <div><span class="pf-state-dot"></span>
+                <div><b>Status identitas &amp; proses surat</b><small>Informasi ini dipakai otomatis pada Surat Perintah
+                    dan Kwitansi.</small></div>
+              </div>
+              <div id="identityStatus" class="auto-status">● Menunggu data identitas BKU. Baca PDF terlebih dahulu.
+              </div>
+            </div>
+            <div class="profile-modal-body">
+              <div class="pf-grid">
+                <section class="pf-card">
+                  <h3 class="pf-title"><span class="pf-title-icon">ID</span> Identitas Sekolah &amp; Pejabat <span
+                      class="pf-title-tag">OTOMATIS BKU</span></h3>
+                  <div class="pf-fields">
+                    <div class="field"><label>NPSN <span class="auto-tag">OTOMATIS BKU</span></label><input
+                        id="suratNpsn" value="" readonly placeholder="Menunggu data BKU"></div>
+                    <div class="field"><label>Sekolah <span class="auto-tag">OTOMATIS BKU</span></label><input
+                        id="suratSD" value="" autocomplete="organization" readonly placeholder="Menunggu data BKU">
+                    </div>
+                    <div class="field"><label>Kecamatan <span class="auto-tag">OTOMATIS BKU</span></label><input
+                        id="suratKecamatan" value="" autocomplete="address-level3" readonly
+                        placeholder="Menunggu data BKU"></div>
+                    <div class="field"><label>Nama Kepala Sekolah <span class="auto-tag">OTOMATIS
+                          BKU</span></label><input id="suratKepala" value="" readonly placeholder="Menunggu data BKU">
+                    </div>
+                    <div class="field"><label>NIP Kepala Sekolah <span class="auto-tag">OTOMATIS
+                          BKU</span></label><input id="suratNipKepala" value="" readonly
+                        placeholder="Menunggu data BKU"></div>
+                    <div class="field"><label>Nama Bendahara <span class="auto-tag">OTOMATIS BKU</span></label><input
+                        id="suratBendahara" value="" readonly placeholder="Menunggu data BKU"></div>
+                    <div class="field"><label>NIP Bendahara <span class="auto-tag">OTOMATIS BKU</span></label><input
+                        id="suratNipBendahara" value="" readonly placeholder="Menunggu data BKU"></div>
+                  </div>
+                </section>
+                <section class="pf-card">
+                  <h3 class="pf-title">Data Surat &amp; Kontak <button id="editProfileBtn" type="button"
+                      class="pf-edit-btn" aria-label="Edit Data Surat dan Kontak" title="Edit profil"><span
+                        aria-hidden="true">✎</span></button><span id="profileLockStatus" class="pf-lock-status">BELUM
+                      DISIMPAN</span></h3>
+                  <div class="pf-fields">
+                    <div class="field"><label>Nomor Urut SD</label><input id="suratNomor" value="" inputmode="numeric"
+                        placeholder="Contoh: 123"></div>
+                    <div class="field"><label>Alamat Sekolah <span class="manual-tag">DAPAT DIUBAH</span></label><input
+                        id="suratAlamat" value=""
+                        placeholder="Alamat sekolah dari BKU, dapat disesuaikan sebelum cetak"></div>
+                    <div class="field"><label>Email Sekolah</label><input id="suratEmail" value=""></div>
+                    <div class="field"><label>NSS</label><input id="suratNss" value=""></div>
+                  </div>
+                </section>
+                <section class="pf-card">
+                  <h3 class="pf-title"><span class="pf-title-icon">⚙</span> Informasi Proses Surat <span
+                      class="pf-title-tag manual">DAPAT DIATUR</span></h3>
+                  <div id="suratNextInfo" class="surat-next-info pf-process-next">Pilih transaksi BKU untuk mengaktifkan
+                    perpindahan surat otomatis.</div>
+                  <div class="pf-process-grid">
+                    <div class="field"><label>Logo Sekolah <span class="manual-tag">PNG</span></label><input
+                        id="suratLogoSekolah" type="file" accept="image/png,.png">
+                      <div class="small" id="logoSekolahStatus">Belum ada logo sekolah. Pilih file PNG untuk
+                        menampilkannya di sisi kanan kop surat.</div>
+                    </div>
+                    <div class="field"><label>Logo Instansi / Daerah <span class="auto-tag">PNG BAWAAN</span></label>
+                      <div class="logo-kabupaten-status"><img src="assets/logo_kabupaten_serang.png"
+                          alt="Logo Instansi">
+                        <div><b>Logo Instansi / Daerah</b>
+                          <div class="small">Dipakai otomatis di sisi kiri kop surat.</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="field"><label>Tanda Tangan Kepala Sekolah</label><input id="suratTandaTangan"
+                        type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
+                      <div class="small">Upload PNG/JPG/WebP. Berlaku untuk Surat Perintah dan Kwitansi. Jika tidak
+                        diunggah, tanda tangan dari template S Perintah tetap digunakan.</div>
+                    </div>
+                    <div class="field"><label>Tanda Tangan Bendahara</label><input id="suratTandaTanganBendahara"
+                        type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
+                      <div class="small">Upload PNG/JPG/WebP. Hanya tampil di Kwitansi.</div>
+                    </div>
+                  </div>
+                  <div class="pf-process-bottom">
+                    <div class="surat-note">Surat dikunci ke <b>A4 portrait (210 × 297 mm)</b>. <b>Harap Dibayar
+                        Kepada</b> dan <b>Untuk Pembayaran</b> disimpan <b>terpisah untuk setiap No. Bukti</b>.
+                      <b>Uraian</b> dibaca otomatis dari BKU.
+                    </div>
+                    <button id="saveProfileBtn" type="button" class="btn primary pf-save-btn">💾 Simpan Profil</button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div id="tabBku" class="tab-panel bku-group" role="tabpanel">
+          <section class="card">
+            <div class="upload-head">
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="section-title">Impor Dokumen BKU</div>
+                <div class="section-sub">Pilih berkas sumber untuk mulai mengekstrak dan memvalidasi transaksi.</div>
+              </div>
+            </div>
+            <div class="controls">
+              <input id="fileInput" type="file"
+                accept=".pdf,.xlsx,.xls,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+              <button id="readBtn" class="btn primary" disabled>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>BACA DATA</span>
+              </button>
+              <button id="saveProjectBtn" class="btn project-save-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>SIMPAN PEKERJAAN</span>
+              </button>
+              <button id="openProjectBtn" class="btn project-open-trigger" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>BUKA PEKERJAAN</span>
+              </button>
+              <button id="projectBackupAllMainBtn" class="btn project-backup-all-btn" type="button">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>CADANGKAN SEMUA</span>
+              </button>
+              <button id="exportBtn" class="btn success" disabled>
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="8" y1="13" x2="16" y2="13"></line>
+                  <line x1="8" y1="17" x2="16" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>EXPORT EXCEL</span>
+              </button>
+              <button id="clearBtn" class="btn secondary">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                  style="vertical-align:middle;margin-right:6px;">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                <span>RESET</span>
+              </button>
+            </div>
+            <div class="project-save-row"><span id="projectSaveName">Belum ada pekerjaan tersimpan.</span><span
+                id="projectSaveStatus" class="project-save-status">Penyimpanan lokal siap digunakan.</span></div>
+            <div class="hint" style="margin-top:12px">Format didukung: PDF, XLSX, dan XLS. BKU dari semua sekolah dapat
+              diproses berdasarkan NPSN. Baris dengan Pengeluaran &gt; 0 akan diproses, kecuali Tarik Tunai yang
+              merupakan pemindahan dana internal.</div>
+          </section>
+          <section class="card">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Pusat status & validasi</div>
+                <div class="section-sub">Informasi proses pembacaan dan peringatan hasil ekstraksi.</div>
+              </div>
+              <div class="small" id="sourceInfo">Belum ada file dibaca.</div>
+            </div>
+            <div id="status" class="status" style="margin-top:12px">Siap. Pilih dokumen lalu tekan BACA DATA.</div>
+            <div id="warnings"></div>
+          </section>
+          <section class="card">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Versi 1 — Rincian Transaksi Pengeluaran (BPU/BNU Digabung)</div>
+                <div class="section-sub">Tetap menggunakan hasil penggabungan BPU/BNU seperti fitur lama. Periksa
+                  tanggal, nomor bukti, uraian, dan nominal sebelum ekspor.</div>
+              </div><input id="searchRows" class="search" type="search" placeholder="⌕  Cari uraian / nomor bukti..."
+                aria-label="Cari transaksi">
+            </div>
+            <div class="table-wrap result-table-wrap" style="margin-top:14px">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>No. Bukti</th>
+                    <th>Uraian</th>
+                    <th class="num">Pengeluaran (Rp)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody">
+                  <tr>
+                    <td colspan="5" class="empty">Belum ada data. Impor dokumen untuk memulai.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="hint" style="margin-top:11px">Catatan: data ditampilkan dalam kontainer yang dapat digulir
+              supaya halaman aplikasi tetap ringkas. Uraian mengikuti teks sumber. BPU/BNU boleh kosong untuk transaksi
+              PDF tertentu seperti Setor PPh/PPN dan Setor SIPLah.</div>
+          </section>
+          <section class="card" id="rawExtractionSection">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Versi 2 — Ekstrak Data Murni (Tidak Digabung)</div>
+                <div class="section-sub">Setiap baris hasil pembacaan dipertahankan apa adanya. Data ini digunakan
+                  sebagai sumber harga per item pada Surat Perintah.</div>
+              </div><button id="exportRawBtn" class="btn success" disabled>⇩ &nbsp; EXPORT DATA MURNI</button>
+            </div>
+            <div class="version-badge-row"><span class="version-badge">VERSI 2 • MURNI</span><span class="hint">BPU/BNU
+                yang sama <b>tidak digabung</b>.</span></div>
+            <div class="table-wrap result-table-wrap" style="margin-top:14px">
+              <table class="data-table raw-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>No. Bukti</th>
+                    <th>Nama Barang / Kegiatan</th>
+                    <th class="num">Harga</th>
+                  </tr>
+                </thead>
+                <tbody id="rawTbody">
+                  <tr>
+                    <td colspan="5" class="empty">Belum ada data murni.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="raw-total-row"><span>Data murni ditampilkan dalam kontainer scroll</span><b id="rawTotal">0</b>
+            </div>
+          </section>
+        </div>
+        <div id="tabSurat" class="tab-panel surat-group" role="tabpanel">
+          <div class="sv-layout" id="suratSection">
+
+            <!-- ================= KOLOM KIRI: INFORMASI ================= -->
+            <aside class="sv-left">
+              <section class="sv-card sv-isi">
+                <div class="isi-card-head">
+                  <div>
+                    <div class="isi-kicker">FORMULIR SURAT PERINTAH</div>
+                    <h3 class="sv-card-title">Isi Surat</h3>
+                    <p>Isi data berurutan dari transaksi sampai kategori belanja. Data yang bertanda <b>OTOMATIS</b>
+                      berasal dari BKU.</p>
+                  </div>
+                  <div class="isi-required-note"><span>●</span> Wajib diisi</div>
+                </div>
+                <div id="suratIsiForm" class="isi-form">
+                  <div class="isi-group">
+                    <div class="isi-group-head"><span class="isi-step">1</span>
+                      <div><b>Transaksi</b><small>Pilih No. Bukti BKU dan tanggal surat</small></div>
+                    </div>
+                    <div class="isi-fields">
+                      <div class="field"><label for="suratBukti">No. Bukti BKU <span class="req">*</span></label><select
+                          id="suratBukti" disabled>
+                          <option value="">Baca data BKU terlebih dahulu</option>
+                        </select></div>
+                      <div class="field"><label for="suratTanggal">Tanggal Surat <span
+                            class="req">*</span></label><input id="suratTanggal" type="date"></div>
+                    </div>
+                  </div>
+                  <div class="isi-group">
+                    <div class="isi-group-head"><span class="isi-step">2</span>
+                      <div><b>Penerima &amp; Pembayaran</b><small>Ketik nama penerima dan tujuan pembayaran</small>
+                      </div>
+                    </div>
+                    <div class="isi-fields">
+                      <div class="field">
+                        <label for="suratKepada">Harap Dibayar Kepada <span class="req">*</span></label>
+                        <input id="suratKepada" list="suratKepadaDatalist" autocomplete="off"
+                          placeholder="Nama penerima/pihak yang dibayar">
+                        <datalist id="suratKepadaDatalist"></datalist>
+                        <div id="suratKepadaSuggestions" class="surat-suggestion-box" style="display:none"
+                          aria-live="polite"></div>
+                      </div>
+                      <div class="field">
+                        <label for="suratUntukPembayaran">Untuk Pembayaran <span class="req">*</span> <span
+                            class="manual-tag">INPUT MANUAL</span></label>
+                        <textarea id="suratUntukPembayaran" list="suratUntukPembayaranDatalist" autocomplete="off"
+                          placeholder="Tulis tujuan pembayaran secara manual sesuai kebutuhan surat perintah"></textarea>
+                        <datalist id="suratUntukPembayaranDatalist"></datalist>
+                        <div id="suratUntukPembayaranSuggestions" class="surat-suggestion-box" style="display:none"
+                          aria-live="polite"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="isi-group">
+                    <div class="isi-group-head"><span class="isi-step">3</span>
+                      <div><b>Uraian</b><small>Dibaca otomatis dari data murni BKU</small></div>
+                    </div>
+                    <div class="isi-fields">
+                      <div class="field"><label for="suratUraian">Uraian <span class="auto-tag">VERSI 2 • DATA
+                            MURNI</span></label><textarea id="suratUraian" readonly
+                          placeholder="Uraian transaksi akan diambil dari data murni BKU"></textarea>
+                        <div class="small">Di surat, uraian dirender sebagai kolom <b>No | Nama Barang / Kegiatan |
+                            Harga</b>.</div>
+                      </div>
+                    </div>
+                  </div> -->
+                  <div class="isi-group">
+                    <div class="isi-group-head"><span class="isi-step">4</span>
+                      <div><b>Kategori Belanja</b><small>Wajib dipilih sebelum data disimpan</small></div>
+                    </div>
+                    <div class="isi-fields">
+                      <div class="category-field surat-category-field"><label for="categorySelect">Kategori Belanja
+                          <span class="required">*</span></label><select id="categorySelect" required>
+                          <option value="">— Pilih kategori belanja —</option>
+                          <option value="Belanja Modal : Peralatan dan Mesin">Belanja Modal : Peralatan dan Mesin
+                          </option>
+                          <option value="Belanja Modal : Aset Tetap Lainya">Belanja Modal : Aset Tetap Lainya</option>
+                          <option value="Belanja Operasional : Barang dan Jasa">Belanja Operasional : Barang dan Jasa
+                          </option>
+                          <option value="Belanja Operasional : Pegawai">Belanja Operasional : Pegawai</option>
+                        </select></div>
+                    </div>
+                  </div>
+                  <div class="isi-footer">
+                    <div id="suratSaveChecklist" class="isi-checklist" aria-live="polite"></div>
+                    <div id="suratDraftSaveStatus" class="surat-draft-save-status">Belum ada data tersimpan untuk No.
+                      Bukti ini.</div>
+                    <button id="suratSaveDataBtn" type="button" class="btn isi-save-btn" disabled>💾 Simpan Data
+                      SPMU</button>
+                  </div>
+                </div>
+              </section>
+
+
+            </aside>
+
+            <!-- ================= KOLOM KANAN: PRATINJAU ================= -->
+            <main class="sv-right">
+              <section class="sv-card sv-viewer-card">
+                <div class="sv-head">
+                  <h3 id="svDocTitle" class="sv-card-title" style="margin:0">Surat Perintah hasil pratinjau</h3>
+                  <div class="sv-pills surat-actions">
+                    <button id="suratPreviewBtn" type="button" class="sv-pill sv-pill-active" disabled>Surat</button>
+                    <button id="kwitansiPreviewBtn" type="button" class="sv-pill" disabled>Kwitansi</button>
+                    <button type="button" id="suratPrevBtn" class="sv-pill" disabled>◀ Sebelumnya</button>
+                    <button type="button" id="suratNextBtn" class="sv-pill" disabled>Berikutnya ▶</button>
+                    <button id="suratPrintBtn" type="button" class="sv-pill" disabled>Cetak / PDF</button><button
+                      id="suratBatchPrintBtn" type="button" class="sv-pill sv-pill-batch" disabled>🖨 Cetak / PDF
+                      Massal</button>
+                  </div>
+                </div>
+                <div class="sv-toolbar">
+                  <div class="sv-nav">
+                    <button type="button" id="svPrevPage" class="sv-pill sv-pill-sm" disabled>Sebelumnya</button>
+                    <button type="button" id="svNextPage" class="sv-pill sv-pill-sm" disabled>Berikutnya</button>
+                    <span id="svPageInfo" class="sv-info">Halaman <b>– / –</b></span>
+                  </div>
+                  <div class="sv-zoom">
+                    <button type="button" id="svZoomOut" class="sv-round" aria-label="Perkecil" disabled>−</button>
+                    <span id="svZoomInfo" class="sv-info">Zoom <b>100%</b></span>
+                    <button type="button" id="svZoomIn" class="sv-round" aria-label="Perbesar" disabled>+</button>
+                  </div>
+                </div>
+                <div class="sv-stage">
+                  <div id="suratPreview" class="surat-preview" style="display:none"></div>
+                  <div class="sv-empty">Pratinjau surat akan tampil di sini setelah data BKU dibaca dan transaksi
+                    dipilih.</div>
+                </div>
+              </section>
+            </main>
+
+          </div>
+        </div>
+        <div id="tabPajak" class="tab-panel pajak-group" role="tabpanel">
+          <section class="card">
+            <div class="upload-head">
+              <div class="upload-icon">%</div>
+              <div>
+                <div class="section-title">Hitung Pajak</div>
+                <div class="section-sub">Hanya transaksi bertuliskan Setor PPh / Setor PPN yang ditampilkan dan
+                  dihitung. Nilai pajak dihitung dari data murni hasil ekstraksi, tanpa mengubah data BKU.</div>
+              </div>
+            </div>
+            <div class="tax-summary-grid">
+              <div class="metric tax-siplah"><span>Total Pajak SIPLah</span><b id="taxSiplahTotal">0</b></div>
+              <div class="metric tax-nonsiplah"><span>Total Pajak Non SIPLah</span><b id="taxNonSiplahTotal">0</b></div>
+              <div class="metric"><span>Total Seluruh Pajak</span><b id="taxGrandTotal">0</b></div>
+              <div class="metric"><span>Jumlah Transaksi Pajak</span><b id="taxCount">0</b></div>
+            </div>
+            <div class="tax-note">Pajak yang dihitung hanya dua jenis: <b>(1) Pajak SIPLah</b> — transaksi bertuliskan
+              <b>Setor …</b> yang memuat <b>(Transaksi SIPLah)</b>; dan <b>(2) Pajak Non SIPLah</b> — transaksi
+              bertuliskan <b>Setor PPh</b> atau <b>Setor PPN</b>. Transaksi lain tidak dihitung dan tidak ada tarif
+              pajak yang ditebak.
+            </div>
+          </section>
+          <section class="card">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Daftar Pajak SIPLah</div>
+                <div class="section-sub">Setor … yang bertuliskan (Transaksi SIPLah).</div>
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top:14px">
+              <table class="data-table tax-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>No. Bukti</th>
+                    <th>Jenis Pajak</th>
+                    <th>Uraian</th>
+                    <th class="num">Nilai Pajak</th>
+                  </tr>
+                </thead>
+                <tbody id="taxSiplahBody">
+                  <tr>
+                    <td colspan="6" class="empty">Belum ada data pajak SIPLah.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="raw-total-row"><span>Total Pajak SIPLah</span><b id="taxSiplahFooter">0</b></div>
+          </section>
+          <section class="card">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Daftar Pajak Non SIPLah</div>
+                <div class="section-sub">Setor PPh/PPN tanpa tulisan (Transaksi SIPLah).</div>
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top:14px">
+              <table class="data-table tax-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>No. Bukti</th>
+                    <th>Jenis Pajak</th>
+                    <th>Uraian</th>
+                    <th class="num">Nilai Pajak</th>
+                  </tr>
+                </thead>
+                <tbody id="taxNonSiplahBody">
+                  <tr>
+                    <td colspan="6" class="empty">Belum ada data pajak Non SIPLah.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="raw-total-row"><span>Total Pajak Non SIPLah</span><b id="taxNonSiplahFooter">0</b></div>
+          </section>
+        </div>
+        <div class="footer">Sistem Informasi Akuntansi &amp; Pengelolaan BOSP (SIAP BOS) • Dibuat oleh <b>MR.
+            LOADING</b></div>
+    </div>
+
+    </main>
+  </div>
+  <div id="projectModal" class="project-modal" aria-hidden="true">
+    <div class="project-modal-card" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+      <div class="project-modal-head">
+        <div>
+          <div id="projectModalTitle" class="project-modal-title">Pekerjaan Tersimpan</div>
+          <div id="projectModalSubtitle" class="project-modal-subtitle">Data disimpan hanya pada browser/perangkat ini.
+          </div>
+        </div><button id="projectModalClose" class="project-modal-close" type="button" aria-label="Tutup"
+          style="position: absolute; right: 24px; top: 24px; cursor: pointer; z-index: 10;">×</button>
+      </div>
+      <div id="projectSaveBox" class="project-save-box" style="display:none"><label for="projectNameInput">Nama
+          pekerjaan</label>
+        <div class="project-save-input-row"><input id="projectNameInput" class="project-name-input" type="text"
+            maxlength="120" placeholder="Contoh: BKU SD Negeri Krian September 2026"><button id="projectConfirmSaveBtn"
+            class="btn primary" type="button">Simpan</button></div>
+        <div class="small">File BKU dan seluruh hasil kerja akan ikut disimpan.</div>
+      </div>
+      <div id="projectList" class="project-list">
+        <div class="project-empty">Memuat pekerjaan tersimpan…</div>
+      </div>
+      <div class="project-modal-foot">
+        <div><span class="small">Pekerjaan disimpan di browser. <b>Cadangan .SPMU</b> dapat diunduh dan dibuka kembali
+            kapan saja.</span>
+          <div id="projectBackupAllStatus" class="project-backup-all-status" aria-live="polite">Cadangkan seluruh
+            pekerjaan ke satu berkas.</div>
+        </div>
+        <div class="project-foot-actions" style="display:flex;gap:8px;flex-wrap:wrap"><input id="projectImportInput"
+            type="file" accept=".spmu,application/json" style="display:none"><button id="projectBackupAllBtn"
+            class="btn project-backup-all-btn" type="button">⇩ Cadangkan Semua</button><button id="projectImportBtn"
+            class="btn secondary" type="button">↥ Impor .SPMU</button><button id="projectCancelBtn"
+            class="btn secondary" type="button">Tutup</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="batchPrintModal" class="batch-print-modal" aria-hidden="true" style="display:none">
+    <div class="batch-print-card" role="dialog" aria-modal="true" aria-labelledby="batchPrintTitle">
+      <div class="batch-print-head">
+        <div>
+          <div id="batchPrintTitle" class="batch-print-title">Cetak / Simpan PDF Massal</div>
+          <div class="batch-print-subtitle">Pilih BPU/BNU yang sudah tersimpan lengkap. Semua surat terpilih akan masuk
+            dalam satu proses cetak / Save as PDF.</div>
+        </div>
+        <button id="batchPrintCancel" class="project-modal-close" type="button" aria-label="Tutup"
+          style="position: absolute; right: 24px; top: 24px; cursor: pointer; z-index: 10;">×</button>
+      </div>
+      <div class="batch-filter-row batch-doc-row"><b>Dokumen:</b><label><input type="radio" name="batchDocType"
+            value="surat" checked> Surat Perintah</label><label><input type="radio" name="batchDocType"
+            value="kwitansi"> Kwitansi</label><label><input type="radio" name="batchDocType" value="both"> Surat +
+          Kwitansi</label></div>
+      <div class="batch-filter-row">
+        <button id="batchFilterAll" type="button" class="btn secondary batch-filter active">Semua</button>
+        <button id="batchFilterBpu" type="button" class="btn secondary batch-filter">BPU</button>
+        <button id="batchFilterBnu" type="button" class="btn secondary batch-filter">BNU</button>
+        <button id="batchSelectAll" type="button" class="btn secondary">Pilih Semua Siap</button>
+        <button id="batchClearAll" type="button" class="btn secondary">Hapus Pilihan</button>
+        <span id="batchPrintCount" class="batch-count">0 dipilih</span>
+      </div>
+      <div id="batchPrintHint" class="batch-print-hint">Pilih hanya surat dengan status “Lengkap & tersimpan”.</div>
+      <div id="batchPrintList" class="batch-print-list">
+        <div class="batch-empty">Memuat daftar surat…</div>
+      </div>
+      <div class="batch-print-foot">
+        <span class="small">Catatan: klik <b>Cetak / PDF Massal</b>, lalu pada dialog printer pilih printer biasa atau
+          <b>Save as PDF</b> untuk menyimpan semua surat sekaligus.</span>
+        <div class="batch-foot-actions"><button id="batchPrintAction" type="button" class="btn primary" disabled>🖨
+            Cetak / Simpan PDF Terpilih</button><button id="batchPrintCancel2" type="button"
+            class="btn secondary">Tutup</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="suratSavedModal" class="saved-modal" aria-hidden="true">
+    <div class="saved-card" role="alertdialog" aria-modal="true" aria-labelledby="suratSavedTitle">
+      <div class="saved-icon" aria-hidden="true">✓</div>
+      <div id="suratSavedTitle" class="saved-title">Berhasil Disimpan</div>
+      <div class="saved-sub">Data SPMU untuk No. Bukti berikut telah tersimpan.</div>
+      <div class="saved-label">No. Bukti</div>
+      <div id="suratSavedBukti" class="saved-bukti">-</div>
+      <div id="suratSavedMeta" class="saved-meta"></div>
+      <button id="suratSavedOk" type="button" class="btn primary saved-ok">OK</button>
+    </div>
+  </div>
+
+  <div id="mrLoadingOverlay" class="mr-loading-overlay" aria-hidden="true">
+    <div class="mr-loading-card">
+      <div id="mrLoadingAvatar" class="mr-loading-avatar" aria-live="polite">
+        <div class="mr-spinner"></div>
+        <div class="mr-face">👨‍💼</div>
+      </div>
+      <div class="mr-loading-title">LOADING</div>
+      <div id="mrLoadingText" class="mr-loading-text">Menyiapkan pembacaan BKU…</div>
+      <div class="mr-loading-bar"><span id="mrLoadingProgress"></span></div>
+      <div id="mrLoadingDetail" class="mr-loading-detail">Mohon tunggu, data sedang dibaca dengan teliti.</div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>if (!window.pdfjsLib) { document.write('<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"><\/script>'); }</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>if (!window.XLSX) { document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>'); }</script>
+  <script src="js/core.js"></script>
+  <script src="js/npsn-serang.js"></script>
+  <script src="js/bku-parser.js"></script>
+  <script src="js/surat.js"></script>
+  <script src="js/kwitansi.js"></script>
+  <script src="js/bku-ui.js"></script>
+  <script src="js/surat-viewer.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-store.js"></script>
+  <script src="js/project-store.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/main.js"></script>
+
+  <script src="js/bku-action-manager.js"></script>
+
+  <script>
+    /* ============================================================
+       SISTEM LOGIN NPSN — SIAP BOS
+       ============================================================ */
+    (function () {
+      const SESSION_KEY = 'SIAP_BOS_NPSN_SESSION';
+      const SCHOOL_KEY = 'SIAP_BOS_SCHOOL_NAME';
+
+      // Cek session yang masih aktif
+      async function checkNpsnSession() {
+        const saved = sessionStorage.getItem(SESSION_KEY);
+        const token = sessionStorage.getItem('SIAP_BOS_SCHOOL_TOKEN');
+        if (saved && /^\d{8,10}$/.test(saved) && token && window.SIAP_BOS_SUPABASE?.isConfigured?.()) {
+          const verified = await window.SIAP_BOS_SUPABASE.schoolVerify();
+          if (verified?.authenticated) {
+            unlockApp(saved, verified.school_name || sessionStorage.getItem(SCHOOL_KEY) || '');
+            return;
+          }
+        }
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SCHOOL_KEY);
+      }
+
+      // Login NPSN (Wajib Diaktifkan dari Panel Monitoring)
+      window.doNpsnLogin = async function () {
+        const input = document.getElementById('npsn-input');
+        const errEl = document.getElementById('npsn-error');
+        const errTextEl = document.getElementById('npsn-error-text');
+        const npsn = (input?.value || '').replace(/\D/g, '').trim();
+
+        function showError(msg) {
+          if (errTextEl) errTextEl.textContent = msg;
+          else if (errEl) errEl.textContent = msg;
+          if (errEl) errEl.style.display = 'flex';
+          if (input) {
+            input.classList.add('is-invalid');
+            input.focus();
+          }
+        }
+
+        if (!npsn || !/^\d{8,10}$/.test(npsn)) {
+          showError('Format NPSN tidak valid. Masukkan 8 digit angka terdaftar.');
+          return;
+        }
+
+        // Validasi NPSN terdaftar
+        const allowed = window.SPMU?.ALLOWED_NPSN;
+        if (allowed && allowed.size > 0 && !allowed.has(npsn)) {
+          showError('NPSN ' + npsn + ' tidak terdaftar dalam database sekolah.');
+          return;
+        }
+
+        if (errEl) errEl.style.display = 'none';
+        if (input) input.classList.remove('is-invalid');
+        const btn = document.getElementById('npsn-login-btn');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="gov-spinner"></span><span>Memeriksa Status Aktivasi Akses...</span>';
+        }
+
+        // Cari nama sekolah & kecamatan dari master NPSN
+        let schoolName = '';
+        if (typeof window.SPMU !== 'undefined' && typeof window.SPMU.getNpsnData === 'function') {
+          const data = window.SPMU.getNpsnData(npsn);
+          schoolName = data?.name || data?.school || '';
+        }
+        if (!schoolName && Array.isArray(window.NPSN_SERANG_DATA)) {
+          const found = window.NPSN_SERANG_DATA.find(x => String(x.npsn || x.NPSN) === npsn);
+          schoolName = found?.name || found?.sekolah || found?.school || '';
+        }
+
+        // LOGIN NPSN KE SUPABASE CLOUD — hanya NPSN yang aktif yang mendapat session token.
+        try {
+          const loginData = await window.SIAP_BOS_SUPABASE.schoolLogin(npsn);
+          schoolName = loginData.school_name || schoolName;
+          sessionStorage.setItem(SESSION_KEY, loginData.npsn || npsn);
+          sessionStorage.setItem(SCHOOL_KEY, schoolName);
+          sessionStorage.setItem('SIAP_BOS_SCHOOL_KECAMATAN', loginData.kecamatan || '');
+          unlockApp(loginData.npsn || npsn, schoolName);
+        } catch (netErr) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="btn-text">Masuk ke Ruang Kerja BKU</span><svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+          }
+          showError('Login gagal: ' + (netErr.message || 'Gagal terhubung ke Supabase Cloud.'));
+          return;
+        }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="btn-text">Masuk ke Ruang Kerja BKU</span><svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+        }
+      };
+
+      // Tampilkan app, sembunyikan lock screen
+      function unlockApp(npsn, schoolName) {
+        // Simpan ke window agar bisa diakses seluruh modul
+        window.SIAP_BOS_CURRENT_NPSN = npsn;
+        window.SIAP_BOS_CURRENT_SCHOOL = schoolName;
+
+        const lock = document.getElementById('npsn-lock-screen');
+        if (lock) lock.style.display = 'none';
+
+        // Tampilkan info sekolah di topbar
+        const nameEl = document.getElementById('profileTriggerName');
+        const metaEl = document.getElementById('profileTriggerMeta');
+        const avatarEl = document.getElementById('profileTriggerAvatar');
+        if (nameEl) nameEl.textContent = schoolName || ('NPSN: ' + npsn);
+        if (metaEl) metaEl.textContent = 'NPSN: ' + npsn;
+        if (avatarEl) avatarEl.textContent = npsn.slice(-2);
+
+        // Re-render dashboard dengan data sekolah ini
+        setTimeout(() => { window.SPMU?.renderDashboard?.(); }, 300);
+      }
+
+      // Tombol Enter pada input NPSN + preview nama sekolah real-time
+      document.addEventListener('DOMContentLoaded', function () {
+        const inp = document.getElementById('npsn-input');
+        const preview = document.getElementById('npsn-school-preview');
+        const previewName = document.getElementById('npsn-school-name');
+        const previewKec = document.getElementById('npsn-school-kec');
+        let lookupTimer = null;
+
+        if (inp) {
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') window.doNpsnLogin(); });
+
+          inp.addEventListener('input', e => {
+            // Hanya izinkan angka
+            e.target.value = e.target.value.replace(/\D/g, '');
+            const npsn = e.target.value;
+            const allowed = window.SPMU?.ALLOWED_NPSN;
+
+            // Sembunyikan preview dulu
+            if (preview) preview.style.display = 'none';
+
+            // Jika sudah 8+ digit dan NPSN terdaftar, cari nama sekolah & status aktivasi
+            if (npsn.length >= 8 && allowed && allowed.has(npsn)) {
+              clearTimeout(lookupTimer);
+              lookupTimer = setTimeout(async () => {
+                try {
+                  const info = await window.SPMU?.lookupNpsnInfo?.(npsn);
+                  let isActive = false;
+                  try {
+                    const cData = await window.SIAP_BOS_SUPABASE.schoolCheck(npsn);
+                    isActive = !!cData?.active;
+                  } catch (_) {}
+
+                  inp.style.borderColor = isActive ? '#10b981' : '#f59e0b'; // hijau jika aktif, kuning jika belum
+
+                  if (info?.school && previewName) {
+                    previewName.innerHTML = `${info.school} <span style="font-size:11px; padding:2px 8px; border-radius:9999px; font-weight:800; margin-left:6px; background:${isActive ? 'rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);' : 'rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3);'}">${isActive ? '✓ AKTIF (BISA LOGIN)' : '🔒 BELUM DIAKTIFKAN DI PANEL ADMIN'}</span>`;
+                    previewKec.textContent = info.kecamatan ? 'Kecamatan ' + info.kecamatan : '';
+                    if (preview) preview.style.display = 'block';
+                  }
+                } catch (_) { }
+              }, 400);
+            } else if (npsn.length >= 8 && allowed && allowed.size > 0 && !allowed.has(npsn)) {
+              inp.style.borderColor = '#ef4444'; // merah
+              if (preview) preview.style.display = 'none';
+            } else {
+              inp.style.borderColor = ''; // reset
+            }
+          });
+        }
+        checkNpsnSession();
+      });
+
+      // Fungsi logout (bisa dipanggil dari tombol)
+      window.logoutNpsn = async function () {
+        try { await window.SIAP_BOS_SUPABASE.schoolLogout(); } catch (_) {}
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SCHOOL_KEY);
+        window.SIAP_BOS_CURRENT_NPSN = null;
+        const lock = document.getElementById('npsn-lock-screen');
+        if (lock) { lock.style.display = 'flex'; }
+        const inp = document.getElementById('npsn-input');
+        if (inp) { inp.value = ''; inp.focus(); }
+      };
+    })();
+  </script>
+</body>
+
+</html>
