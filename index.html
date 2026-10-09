@@ -94,6 +94,22 @@
           <div id="npsn-school-kec" class="gov-preview-kec"></div>
         </div>
 
+        <div class="gov-input-head" style="margin-top:14px;">
+          <label for="npsn-pin-input" class="gov-input-label">
+            <svg class="gov-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>PIN Sekolah</span>
+          </label>
+          <span class="gov-code-badge">DARI ADMIN</span>
+        </div>
+        <div class="gov-input-wrap">
+          <input id="npsn-pin-input" type="password" maxlength="8" placeholder="Masukkan PIN dari Administrator..."
+            autocomplete="off" inputmode="numeric" class="gov-npsn-field" spellcheck="false">
+        </div>
+
         <!-- Notifikasi Error -->
         <div id="npsn-error" class="gov-auth-error" style="display:none;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -535,8 +551,8 @@
                   <div class="pf-process-grid">
                     <div class="field"><label>Logo Sekolah <span class="manual-tag">PNG</span></label><input
                         id="suratLogoSekolah" type="file" accept="image/png,.png">
-                      <div class="logo-upload-preview" id="logoSekolahPreview"><span class="logo-preview-placeholder">▧</span><span class="logo-preview-copy"><b>Pratinjau logo sekolah</b><small>Logo akan tampil di sisi kanan kop surat.</small></span></div>
-                      <div class="small" id="logoSekolahStatus">Belum ada logo sekolah. Pilih file PNG untuk menampilkannya di sisi kanan kop surat.</div>
+                      <div class="small" id="logoSekolahStatus">Belum ada logo sekolah. Pilih file PNG untuk
+                        menampilkannya di sisi kanan kop surat.</div>
                     </div>
                     <div class="field"><label>Logo Instansi / Daerah <span class="auto-tag">PNG BAWAAN</span></label>
                       <div class="logo-kabupaten-status"><img src="assets/logo_kabupaten_serang.png"
@@ -584,12 +600,7 @@
               </div>
             </div>
             <div class="controls">
-              <label class="bku-upload-zone" for="fileInput">
-                <span class="bku-upload-symbol" aria-hidden="true">↑</span>
-                <span class="bku-upload-copy"><strong>Pilih dokumen BKU</strong><small>Seret berkas ke area ini atau klik untuk memilih</small><small class="bku-upload-formats">PDF · Excel XLSX · Excel XLS</small></span>
-                <span class="bku-upload-browse">Jelajahi berkas</span>
-              </label>
-              <input id="fileInput" class="bku-file-input" type="file"
+              <input id="fileInput" type="file"
                 accept=".pdf,.xlsx,.xls,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
               <button id="readBtn" class="btn primary" disabled>
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -1083,9 +1094,11 @@
       // Login NPSN (Wajib Diaktifkan dari Panel Monitoring)
       window.doNpsnLogin = async function () {
         const input = document.getElementById('npsn-input');
+        const pinInput = document.getElementById('npsn-pin-input');
         const errEl = document.getElementById('npsn-error');
         const errTextEl = document.getElementById('npsn-error-text');
         const npsn = (input?.value || '').replace(/\D/g, '').trim();
+        const pin = (pinInput?.value || '').trim();
 
         function showError(msg) {
           if (errTextEl) errTextEl.textContent = msg;
@@ -1099,6 +1112,12 @@
 
         if (!npsn || !/^\d{8,10}$/.test(npsn)) {
           showError('Format NPSN tidak valid. Masukkan 8 digit angka terdaftar.');
+          return;
+        }
+
+        if (!pin) {
+          showError('PIN wajib diisi. Hubungi Administrator/Pengawas jika belum punya PIN.');
+          pinInput?.focus();
           return;
         }
 
@@ -1130,11 +1149,12 @@
 
         // LOGIN NPSN KE SUPABASE CLOUD — hanya NPSN yang aktif yang mendapat session token.
         try {
-          const loginData = await window.SIAP_BOS_SUPABASE.schoolLogin(npsn);
+          const loginData = await window.SIAP_BOS_SUPABASE.schoolLogin(npsn, pin);
           schoolName = loginData.school_name || schoolName;
           sessionStorage.setItem(SESSION_KEY, loginData.npsn || npsn);
           sessionStorage.setItem(SCHOOL_KEY, schoolName);
           sessionStorage.setItem('SIAP_BOS_SCHOOL_KECAMATAN', loginData.kecamatan || '');
+          if (pinInput) pinInput.value = '';
           unlockApp(loginData.npsn || npsn, schoolName);
         } catch (netErr) {
           if (btn) {
@@ -1179,6 +1199,11 @@
         const previewName = document.getElementById('npsn-school-name');
         const previewKec = document.getElementById('npsn-school-kec');
         let lookupTimer = null;
+
+        const pinInp = document.getElementById('npsn-pin-input');
+        if (pinInp) {
+          pinInp.addEventListener('keydown', e => { if (e.key === 'Enter') window.doNpsnLogin(); });
+        }
 
         if (inp) {
           inp.addEventListener('keydown', e => { if (e.key === 'Enter') window.doNpsnLogin(); });

@@ -116,7 +116,7 @@ function printSurat(){
     const src=img.getAttribute('src');
     if(src){try{img.setAttribute('src',new URL(src,location.href).href);}catch(_){}}
   });
-  const childScript='<scr'+'ipt>window.addEventListener("load",async()=>{const imgs=[...document.images];await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500)})));setTimeout(()=>window.print(),350)});window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),120));</scr'+'ipt>';
+  const childScript='<scr'+'ipt>window.addEventListener("load",()=>setTimeout(()=>window.print(),180));window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),120));</scr'+'ipt>';
   const doc=`<!doctype html><html><head><meta charset="utf-8"><title>${state.docMode==='kwitansi'?'Kwitansi':'Surat Perintah'}</title><style>${styles}</style></head><body>${clone.outerHTML}${childScript}</body></html>`;
   win.document.open();win.document.write(doc);win.document.close();
 }
@@ -226,7 +226,7 @@ function printBatchSurat(indices,docType='surat'){
   `+(ns.KWITANSI_PRINT_CSS||'');
   const clone=master.cloneNode(true);
   clone.querySelectorAll('img').forEach(img=>{const src=img.getAttribute('src');if(src){try{img.setAttribute('src',new URL(src,location.href).href);}catch(_){}}});
-  const childScript='<scr'+'ipt>window.addEventListener("load",async()=>{const imgs=[...document.images];await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500)})));setTimeout(()=>window.print(),350)});window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),120));</scr'+'ipt>';
+  const childScript='<scr'+'ipt>window.addEventListener("load",()=>setTimeout(()=>window.print(),180));window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),120));</scr'+'ipt>';
   const doc=`<!doctype html><html><head><meta charset="utf-8"><title>${docType==='kwitansi'?'Kwitansi Massal':docType==='both'?'SPMU + Kwitansi Massal':'SPMU Massal'}</title><style>${styles}</style></head><body>${clone.outerHTML}${childScript}</body></html>`;
   win.document.open();win.document.write(doc);win.document.close();
   $('batchPrintModal').style.display='none';$('batchPrintModal').setAttribute('aria-hidden','true');

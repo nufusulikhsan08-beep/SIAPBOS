@@ -3569,6 +3569,28 @@
       }
     }
 
+    // Buat / reset PIN login sekolah, lalu tampilkan ke admin agar bisa disampaikan ke sekolah
+    async function handleSetPin(npsn, schoolName) {
+      const conf = confirm(`Buat/reset PIN login untuk [${npsn}] ${schoolName}?\n\nPIN lama (jika ada) akan tidak berlaku lagi.`);
+      if (!conf) return;
+      try {
+        const json = await window.SIAP_BOS_SUPABASE.adminSetPin(npsn, null);
+        if (!json?.success || !json.pin) throw new Error(json?.error || 'Gagal membuat PIN.');
+
+        if (activationsMap[npsn]) activationsMap[npsn].pin_set = true;
+
+        // Tampilkan PIN dalam prompt supaya mudah disalin (hanya muncul sekali, tidak disimpan di tempat lain)
+        window.prompt(
+          `PIN untuk [${npsn}] ${schoolName} berhasil dibuat.\nSalin dan sampaikan PIN ini ke sekolah secara aman (jangan broadcast publik):`,
+          json.pin
+        );
+        showActToast(`🔑 PIN baru dibuat untuk [${npsn}] ${schoolName}`, 'success');
+        renderActivationTable();
+      } catch (err) {
+        showActToast(`Gagal membuat PIN: ${err.message}`, 'error');
+      }
+    }
+
     // Dapatkan data terfilter
     function getFilteredActivationSchools() {
       const all = getAllMasterSchools();
@@ -3703,6 +3725,11 @@
                <span>✓ Aktifkan</span>
              </button>`;
 
+        const pinBtn = `<button type="button" class="btn-act-toggle" style="background:rgba(99,102,241,0.08); color:#6366f1; border:1px solid rgba(99,102,241,0.25); margin-top:6px;"
+            onclick="handleSetPin('${esc(s.npsn)}', '${esc(s.name)}')" title="${act && act.pin_set ? 'Reset PIN sekolah ini' : 'Sekolah ini belum punya PIN — buat sekarang'}">
+            <span>${act && act.pin_set ? '🔑 Reset PIN' : '🔑 Buat PIN'}</span>
+          </button>`;
+
         html += `
           <tr>
             <td style="color:var(--muted); font-size:11.5px; text-align:center;">${no}</td>
@@ -3729,6 +3756,7 @@
             </td>
             <td style="text-align:center;">
               ${actionBtn}
+              ${pinBtn}
             </td>
           </tr>
         `;

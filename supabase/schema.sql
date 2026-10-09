@@ -61,8 +61,18 @@ CREATE TABLE IF NOT EXISTS public.npsn_activations (
   kecamatan TEXT,
   activated_at BIGINT,
   activated_by TEXT,
-  notes TEXT
+  notes TEXT,
+  pin_hash TEXT,
+  pin_set_at BIGINT,
+  failed_pin_attempts INTEGER DEFAULT 0,
+  pin_locked_until BIGINT
 );
+
+-- Kolom PIN login sekolah (ditambahkan belakangan — aman dijalankan ulang).
+ALTER TABLE public.npsn_activations ADD COLUMN IF NOT EXISTS pin_hash TEXT;
+ALTER TABLE public.npsn_activations ADD COLUMN IF NOT EXISTS pin_set_at BIGINT;
+ALTER TABLE public.npsn_activations ADD COLUMN IF NOT EXISTS failed_pin_attempts INTEGER DEFAULT 0;
+ALTER TABLE public.npsn_activations ADD COLUMN IF NOT EXISTS pin_locked_until BIGINT;
 
 -- ---------------------------------------------------------------
 -- 2) Admin + session sekolah
@@ -292,7 +302,10 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.siap_school_login(p_npsn TEXT)
+-- Ganti signature lama (hanya NPSN) dengan versi yang mewajibkan PIN.
+DROP FUNCTION IF EXISTS public.siap_school_login(TEXT);
+
+CREATE OR REPLACE FUNCTION public.siap_school_login(p_npsn TEXT, p_pin TEXT)
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -304,8 +317,9 @@ DECLARE
   v_token TEXT;
   v_ttl BIGINT := 24 * 60 * 60 * 1000;
   v_npsn TEXT := trim(COALESCE(p_npsn, ''));
+  v_pin TEXT := trim(COALESCE(p_pin, ''));
 BEGIN
-  SELECT * INTO v_row FROM public.npsn_activations WHERE npsn = v_npsn;
+  SELECT * INTO v_row FROM public.npsn_activations WHERE npsn = v_npsn FOR UPDATE;
   IF NOT FOUND OR COALESCE(v_row.is_active, 0) <> 1 THEN
     RETURN jsonb_build_object(
       'success', false,
@@ -314,9 +328,37 @@ BEGIN
     );
   END IF;
 
+  IF v_row.pin_hash IS NULL THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error', 'PIN login belum diatur untuk sekolah ini. Hubungi Administrator/Pengawas untuk mendapatkan PIN.'
+    );
+  END IF;
+
+  IF COALESCE(v_row.pin_locked_until, 0) > v_now THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error', 'Login dikunci sementara karena terlalu banyak percobaan PIN yang salah. Coba lagi beberapa menit lagi.'
+    );
+  END IF;
+
+  IF v_pin = '' OR crypt(v_pin, v_row.pin_hash) <> v_row.pin_hash THEN
+    UPDATE public.npsn_activations
+      SET failed_pin_attempts = COALESCE(failed_pin_attempts, 0) + 1,
+          pin_locked_until = CASE WHEN COALESCE(failed_pin_attempts, 0) + 1 >= 5
+                                  THEN v_now + 15 * 60 * 1000 ELSE pin_locked_until END
+    WHERE npsn = v_npsn;
+
+    RETURN jsonb_build_object('success', false, 'error', 'PIN salah. Akses ditolak.');
+  END IF;
+
   v_token := encode(gen_random_bytes(32), 'hex');
   INSERT INTO public.school_sessions(token, npsn, school_name, kecamatan, created_at, expires_at, last_seen_at)
   VALUES (v_token, v_npsn, COALESCE(v_row.school_name, ''), COALESCE(v_row.kecamatan, ''), v_now, v_now + v_ttl, v_now);
+
+  UPDATE public.npsn_activations
+    SET failed_pin_attempts = 0, pin_locked_until = NULL
+  WHERE npsn = v_npsn;
 
   RETURN jsonb_build_object(
     'success', true,
@@ -326,6 +368,43 @@ BEGIN
     'school_name', COALESCE(v_row.school_name, ''),
     'kecamatan', COALESCE(v_row.kecamatan, '')
   );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.siap_admin_set_pin(p_token TEXT, p_npsn TEXT, p_pin TEXT DEFAULT NULL)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+DECLARE
+  v_npsn TEXT := trim(COALESCE(p_npsn, ''));
+  v_pin TEXT := trim(COALESCE(p_pin, ''));
+  v_now BIGINT := EXTRACT(EPOCH FROM now())::bigint * 1000;
+BEGIN
+  IF NOT public.siap_admin_session_valid(p_token) THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Akses ditolak: Otorisasi Administrator diperlukan.');
+  END IF;
+  IF v_npsn = '' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'NPSN tidak boleh kosong.');
+  END IF;
+
+  -- PIN kosong = minta sistem buatkan PIN 6 digit acak.
+  IF v_pin = '' THEN
+    v_pin := lpad(floor(random() * 1000000)::TEXT, 6, '0');
+  ELSIF v_pin !~ '^[0-9]{4,8}$' THEN
+    RETURN jsonb_build_object('success', false, 'error', 'PIN harus berupa 4-8 digit angka.');
+  END IF;
+
+  INSERT INTO public.npsn_activations(npsn, is_active, pin_hash, pin_set_at, failed_pin_attempts, pin_locked_until)
+  VALUES (v_npsn, 0, crypt(v_pin, gen_salt('bf')), v_now, 0, NULL)
+  ON CONFLICT(npsn) DO UPDATE SET
+    pin_hash = crypt(v_pin, gen_salt('bf')),
+    pin_set_at = v_now,
+    failed_pin_attempts = 0,
+    pin_locked_until = NULL;
+
+  RETURN jsonb_build_object('success', true, 'npsn', v_npsn, 'pin', v_pin);
 END;
 $$;
 
@@ -453,6 +532,11 @@ BEGIN
   END IF;
   IF v_id = '' THEN
     RETURN jsonb_build_object('success', false, 'error', 'ID pekerjaan tidak valid.');
+  END IF;
+
+  -- Cegah sekolah lain menimpa/mengambil-alih proyek yang bukan miliknya (IDOR).
+  IF EXISTS (SELECT 1 FROM public.projects WHERE id = v_id AND npsn <> v_npsn) THEN
+    RETURN jsonb_build_object('success', false, 'error', 'ID pekerjaan ini sudah dipakai oleh sekolah lain.');
   END IF;
 
   SELECT school_name, kecamatan INTO v_school, v_kec FROM public.npsn_activations WHERE npsn = v_npsn;
@@ -605,7 +689,8 @@ BEGIN
     'school_name', COALESCE(school_name,''),
     'kecamatan', COALESCE(kecamatan,''),
     'activated_at', activated_at,
-    'activated_by', activated_by
+    'activated_by', activated_by,
+    'pin_set', pin_hash IS NOT NULL
   )), '{}'::jsonb)
   INTO v_map
   FROM public.npsn_activations;
@@ -615,7 +700,8 @@ BEGIN
     'count', (SELECT count(*) FROM public.npsn_activations),
     'activations', v_map,
     'list', COALESCE((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.npsn) FROM (
-      SELECT npsn,is_active,school_name,kecamatan,activated_at,activated_by FROM public.npsn_activations
+      SELECT npsn,is_active,school_name,kecamatan,activated_at,activated_by,(pin_hash IS NOT NULL) AS pin_set
+      FROM public.npsn_activations
     ) x), '[]'::jsonb)
   );
 END;
@@ -713,7 +799,8 @@ REVOKE ALL ON FUNCTION public.siap_admin_verify(TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_admin_logout(TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_admin_change_password(TEXT,TEXT,TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_school_check(TEXT) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.siap_school_login(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.siap_school_login(TEXT,TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.siap_admin_set_pin(TEXT,TEXT,TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_school_verify(TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_school_logout(TEXT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.siap_school_get_projects(TEXT) FROM PUBLIC;
@@ -750,7 +837,8 @@ GRANT EXECUTE ON FUNCTION public.siap_admin_verify(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_admin_logout(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_admin_change_password(TEXT,TEXT,TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_school_check(TEXT) TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.siap_school_login(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.siap_school_login(TEXT,TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.siap_admin_set_pin(TEXT,TEXT,TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_school_verify(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_school_logout(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.siap_school_get_projects(TEXT) TO anon, authenticated;

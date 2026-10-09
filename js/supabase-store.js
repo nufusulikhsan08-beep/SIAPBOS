@@ -96,8 +96,8 @@
     return rpc('siap_school_check', { p_npsn: String(npsn || '').trim() });
   }
 
-  async function schoolLogin(npsn) {
-    const data = await rpc('siap_school_login', { p_npsn: String(npsn || '').trim() });
+  async function schoolLogin(npsn, pin) {
+    const data = await rpc('siap_school_login', { p_npsn: String(npsn || '').trim(), p_pin: String(pin || '').trim() });
     if (!data?.success || !data.token) throw new Error(data?.error || 'NPSN belum diaktifkan oleh Administrator.');
     sessionStorage.setItem(SCHOOL_TOKEN_KEY, data.token);
     sessionStorage.setItem(SCHOOL_NPSN_KEY, data.npsn || npsn);
@@ -249,6 +249,19 @@
     });
   }
 
+  // pin kosong/null = sistem akan generate PIN 6 digit acak dan mengembalikannya di data.pin
+  async function adminSetPin(npsn, pin) {
+    const token = getAdminToken();
+    if (!token) throw new Error('Sesi Administrator tidak tersedia.');
+    const data = await rpc('siap_admin_set_pin', {
+      p_token: token,
+      p_npsn: String(npsn || '').trim(),
+      p_pin: pin ? String(pin).trim() : null
+    });
+    if (!data?.success) throw new Error(data?.error || 'Gagal mengatur PIN.');
+    return data;
+  }
+
   window.SIAP_BOS_SUPABASE = {
     isConfigured,
     rpc,
@@ -273,7 +286,8 @@
     adminDeleteProject,
     adminGetActivations,
     adminToggleActivation,
-    adminBatchActivation
+    adminBatchActivation,
+    adminSetPin
   };
 
   if (isConfigured()) console.log('✓ SIAP BOS: Supabase Cloud siap.');
