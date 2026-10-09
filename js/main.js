@@ -122,11 +122,11 @@ function isRealPng(file){
   });
 }
 $('suratLogoSekolah').addEventListener('change',async e=>{
-  const file=e.target.files?.[0]; const status=$('logoSekolahStatus');
-  if(!file){state.surat.logoSekolah='';if(status)status.textContent='Belum ada logo sekolah. Pilih file PNG untuk menampilkannya di sisi kanan kop surat.';ns.renderSurat();return;}
+  const file=e.target.files?.[0]; const status=$('logoSekolahStatus'); const preview=$('logoSekolahPreview');
+  if(!file){state.surat.logoSekolah='';if(status)status.textContent='Belum ada logo sekolah. Pilih file PNG untuk menampilkannya di sisi kanan kop surat.';if(preview)preview.innerHTML='<span class="logo-preview-placeholder">▧</span><span class="logo-preview-copy"><b>Pratinjau logo sekolah</b><small>Logo akan tampil di sisi kanan kop surat.</small></span>';ns.renderSurat();return;}
   try{
     const valid=await isRealPng(file); if(!valid)throw new Error('Logo sekolah wajib berupa file PNG yang valid.');
-    const reader=new FileReader(); reader.onload=()=>{state.surat.logoSekolah=String(reader.result||'');if(status)status.textContent=`✓ Logo PNG siap: ${file.name}`;ns.renderSurat();ns.scheduleProjectAutoSave?.();};
+    const reader=new FileReader(); reader.onload=()=>{state.surat.logoSekolah=String(reader.result||'');if(status)status.textContent=`✓ Logo PNG siap: ${file.name}`;if(preview)preview.innerHTML=`<img src="${state.surat.logoSekolah}" alt="Pratinjau logo sekolah"><span class="logo-preview-copy"><b>Logo berhasil dimuat</b><small>${file.name.replace(/[&<>"']/g,'')}</small></span>`;ns.renderSurat();ns.scheduleProjectAutoSave?.();};
     reader.onerror=()=>{e.target.value='';state.surat.logoSekolah='';if(status)status.textContent='⚠ Gagal membaca logo sekolah.';ns.renderSurat();ns.scheduleProjectAutoSave?.();};
     reader.readAsDataURL(file);
   }catch(err){e.target.value='';state.surat.logoSekolah='';if(status)status.textContent='⚠ '+(err?.message||'Logo sekolah harus PNG yang valid.');ns.renderSurat();}

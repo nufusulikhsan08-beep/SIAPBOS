@@ -535,8 +535,8 @@
                   <div class="pf-process-grid">
                     <div class="field"><label>Logo Sekolah <span class="manual-tag">PNG</span></label><input
                         id="suratLogoSekolah" type="file" accept="image/png,.png">
-                      <div class="small" id="logoSekolahStatus">Belum ada logo sekolah. Pilih file PNG untuk
-                        menampilkannya di sisi kanan kop surat.</div>
+                      <div class="logo-upload-preview" id="logoSekolahPreview"><span class="logo-preview-placeholder">▧</span><span class="logo-preview-copy"><b>Pratinjau logo sekolah</b><small>Logo akan tampil di sisi kanan kop surat.</small></span></div>
+                      <div class="small" id="logoSekolahStatus">Belum ada logo sekolah. Pilih file PNG untuk menampilkannya di sisi kanan kop surat.</div>
                     </div>
                     <div class="field"><label>Logo Instansi / Daerah <span class="auto-tag">PNG BAWAAN</span></label>
                       <div class="logo-kabupaten-status"><img src="assets/logo_kabupaten_serang.png"
@@ -584,7 +584,12 @@
               </div>
             </div>
             <div class="controls">
-              <input id="fileInput" type="file"
+              <label class="bku-upload-zone" for="fileInput">
+                <span class="bku-upload-symbol" aria-hidden="true">↑</span>
+                <span class="bku-upload-copy"><strong>Pilih dokumen BKU</strong><small>Seret berkas ke area ini atau klik untuk memilih</small><small class="bku-upload-formats">PDF · Excel XLSX · Excel XLS</small></span>
+                <span class="bku-upload-browse">Jelajahi berkas</span>
+              </label>
+              <input id="fileInput" class="bku-file-input" type="file"
                 accept=".pdf,.xlsx,.xls,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
               <button id="readBtn" class="btn primary" disabled>
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"
