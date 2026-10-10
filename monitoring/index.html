@@ -14,13 +14,13 @@
   <script src="../js/npsn-serang.js"></script>
   <style>
     :root {
-      --primary: #3b82f6; --primary-hover: #2563eb; --accent: #06b6d4;
-      --bg: #f0f4f8; --card: rgba(255,255,255,0.92); --text: #0f172a; --muted: #64748b;
-      --border: rgba(226,232,240,0.7); --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-      --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+      --primary: #2563eb; --primary-hover: #1d4ed8; --accent: #38bdf8;
+      --bg: #eef3fb; --card: #ffffff; --text: #0f1f3d; --muted: #5b6b8c;
+      --border: #e4ebfb; --success: #16a36a; --warning: #f59e0b; --danger: #ef4444;
+      --header-bg: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      --shadow-sm: 0 1px 3px rgba(36,86,178,0.06);
+      --shadow-md: 0 6px 16px rgba(36,86,178,0.10);
+      --shadow-lg: 0 16px 44px rgba(36,86,178,0.16);
       --radius: 16px;
     }
     body.dark-mode {
@@ -34,27 +34,23 @@
     /* === EXECUTIVE COMMAND CENTER AUTHENTICATION SCREEN === */
     #lockScreen {
       position: fixed; inset: 0; z-index: 99999;
-      background: radial-gradient(circle at 50% 10%, rgba(37,99,235,0.18) 0%, transparent 65%),
-                  radial-gradient(circle at 80% 90%, rgba(6,182,212,0.12) 0%, transparent 55%),
-                  #070d19;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                        radial-gradient(circle at 50% 10%, rgba(37,99,235,0.18) 0%, transparent 65%),
-                        #070d19;
-      background-size: 24px 24px, 100% 100%, 100% 100%;
+      background: radial-gradient(circle at 50% 8%, rgba(37,99,235,0.12) 0%, transparent 60%),
+                  radial-gradient(circle at 82% 92%, rgba(56,189,248,0.12) 0%, transparent 55%),
+                  linear-gradient(160deg, #eef3fb 0%, #dce7fb 100%);
       display: flex; justify-content: center; align-items: center; padding: 24px;
     }
     .lock-box {
-      background: rgba(15, 23, 42, 0.88);
+      background: #ffffff;
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid #e4ebfb;
       border-radius: 24px;
       padding: 44px 38px;
       width: 100%;
       max-width: 460px;
       text-align: center;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
-      color: #f8fafc;
+      box-shadow: 0 24px 70px rgba(36,86,178,0.18), 0 0 0 1px rgba(255,255,255,0.6);
+      color: #0f1f3d;
       position: relative;
     }
     .lock-emblem-header {
@@ -73,7 +69,7 @@
     .lock-emblem-divider {
       width: 1px;
       height: 42px;
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(15, 31, 61, 0.12);
     }
     .lock-inst-badge {
       display: inline-flex;
@@ -86,7 +82,7 @@
       font-size: 10px;
       font-weight: 800;
       letter-spacing: 1px;
-      color: #93c5fd;
+      color: #2563eb;
       text-transform: uppercase;
       margin-bottom: 12px;
     }
@@ -101,12 +97,12 @@
       font-size: 21px;
       font-weight: 900;
       letter-spacing: -0.4px;
-      color: #ffffff;
+      color: #0f1f3d;
       margin-bottom: 6px;
     }
     .lock-box p {
       font-size: 12.5px;
-      color: #94a3b8;
+      color: #5b6b8c;
       margin: 0 0 26px;
       line-height: 1.55;
     }
@@ -120,7 +116,7 @@
       font-size: 10.5px;
       font-weight: 800;
       letter-spacing: 0.8px;
-      color: #94a3b8;
+      color: #5b6b8c;
       text-transform: uppercase;
       margin-bottom: 8px;
     }
@@ -128,9 +124,9 @@
       width: 100%;
       padding: 14px 16px;
       border-radius: 12px;
-      background: rgba(3, 7, 18, 0.7);
-      border: 1.5px solid rgba(255, 255, 255, 0.14);
-      color: #ffffff;
+      background: rgba(238,243,251,0.9);
+      border: 1.5px solid #e4ebfb;
+      color: #0f1f3d;
       font-size: 14px;
       font-family: inherit;
       outline: none;
@@ -138,9 +134,9 @@
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .pass-input:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
-      background: rgba(3, 7, 18, 0.9);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+      background: #ffffff;
     }
     .btn-unlock {
       width: 100%;
@@ -169,26 +165,63 @@
       transform: translateY(0);
     }
     .err-msg {
-      color: #f87171;
+      color: #ef4444;
       font-size: 11.5px;
       font-weight: 600;
       margin-top: 14px;
       padding: 9px 12px;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.10);
+      border: 1px solid rgba(239, 68, 68, 0.22);
       border-radius: 10px;
       display: none;
     }
     .lock-footer-info {
       margin-top: 24px;
       padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(15, 31, 61, 0.08);
       font-size: 11px;
-      color: #64748b;
+      color: #5b6b8c;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
+    }
+    body.dark-mode #lockScreen {
+      background: radial-gradient(circle at 50% 8%, rgba(37,99,235,0.28) 0%, transparent 60%),
+                  radial-gradient(circle at 82% 92%, rgba(56,189,248,0.20) 0%, transparent 55%),
+                  linear-gradient(160deg, #070d19 0%, #0b1121 100%);
+    }
+    body.dark-mode .lock-box {
+      background: rgba(15,23,42,0.92); color: #f1f5f9; border-color: rgba(255,255,255,0.10);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+    body.dark-mode .lock-box h2 { color: #ffffff; }
+    body.dark-mode .lock-box p, body.dark-mode .lock-input-label { color: #94a3b8; }
+    body.dark-mode .lock-emblem-divider { background: rgba(255,255,255,0.14); }
+    body.dark-mode .pass-input { background: rgba(3,7,18,0.7); border-color: rgba(255,255,255,0.14); color: #ffffff; }
+    body.dark-mode .pass-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.25); background: rgba(3,7,18,0.9); }
+    body.dark-mode .lock-footer-info { color: #64748b; border-top-color: rgba(255,255,255,0.08); }
+    body.dark-mode .err-msg { color: #f87171; }
+
+    #adminLoading {
+      position: relative;
+      height: 3px;
+      background: rgba(37,99,235,0.12);
+      display: none;
+      overflow: hidden;
+    }
+    body.dark-mode #adminLoading { background: rgba(56,189,248,0.18); }
+    #adminLoading::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -40%;
+      width: 40%; height: 100%;
+      background: linear-gradient(90deg, transparent, #2563eb, transparent);
+      animation: adminBarMove 1.1s ease-in-out infinite;
+    }
+    @keyframes adminBarMove {
+      0%   { left: -40%; }
+      100% { left: 100%; }
     }
 
     /* === DASHBOARD === */
@@ -932,14 +965,16 @@
         <div class="header-actions">
           <span class="badge-live">ADMIN ACTIVE</span>
           <a href="../index.html" class="btn-h" style="background:rgba(59,130,246,0.85);color:white;text-decoration:none;" title="Buka Portal Sekolah">◂ Portal Sekolah</a>
-          <button type="button" class="btn-h" style="background:rgba(245,158,11,0.85);color:white;" onclick="openChangePasswordModal()" title="Ganti Kata Sandi Administrator">🔑 Sandi</button>
-          <button type="button" class="btn-h btn-theme" onclick="toggleTheme()">🌓 Tema</button>
-          <button type="button" class="btn-h btn-print" onclick="window.print()">🖨 Cetak</button>
-          <button type="button" class="btn-h btn-excel" onclick="exportExcel()">📥 Excel</button>
-          <button type="button" class="btn-h btn-lock" onclick="logout()">🔒 Kunci</button>
+          <button type="button" class="btn-h" style="background:rgba(245,158,11,0.85);color:white;" onclick="openChangePasswordModal()" title="Ganti Kata Sandi Administrator"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.6 7.6a5.5 5.5 0 1 1-7.8 7.8 5.5 5.5 0 0 1 7.8-7.8zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> Sandi</button>
+          <button type="button" class="btn-h btn-theme" onclick="toggleTheme()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg> Tema</button>
+          <button type="button" class="btn-h btn-print" onclick="window.print()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Cetak</button>
+          <button type="button" class="btn-h btn-excel" onclick="exportExcel()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+          <button type="button" class="btn-h btn-lock" onclick="logout()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Kunci</button>
         </div>
       </div>
     </header>
+
+    <div id="adminLoading" aria-hidden="true"></div>
 
     <main class="container">
       <div class="print-header" style="text-align: center; position:relative; padding-top:4px;">
@@ -953,64 +988,64 @@
       <!-- METRIC CARDS: 8 kartu dengan sub-kategori lengkap -->
       <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">🏫</div>
+          <div class="m-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
           <div class="m-label">Target SD</div>
           <div class="m-val" style="color:var(--primary);">729</div>
           <div class="m-sub">29 Kecamatan</div>
         </div>
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(16,185,129,0.1);color:#10b981;">📊</div>
+          <div class="m-icon" style="background:rgba(16,185,129,0.1);color:#10b981;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
           <div class="m-label">BKU Masuk</div>
           <div class="m-val" style="color:#10b981;" id="statSubmitted">0</div>
           <div class="m-sub" id="statKepatuhan">Kepatuhan: 0%</div>
         </div>
         <div class="m-card" style="grid-column:span 2;">
-          <div class="m-icon" style="background:rgba(5,150,105,0.1);color:#059669;">💰</div>
+          <div class="m-icon" style="background:rgba(5,150,105,0.1);color:#059669;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
           <div class="m-label">Total Realisasi Belanja (dari SPMU)</div>
           <div class="m-val" style="color:#059669;" id="statBelanjaMurni">Rp 0</div>
           <div class="m-sub">Hanya dihitung dari Surat Perintah yang sudah dikerjakan</div>
         </div>
         <!-- Baris 2: Modal dibagi 2 -->
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(37,99,235,0.1);color:#2563eb;">🏗️</div>
+          <div class="m-icon" style="background:rgba(37,99,235,0.1);color:#2563eb;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.3 7 12 12 20.7 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></div>
           <div class="m-label">Modal — Peralatan &amp; Mesin</div>
           <div class="m-val" style="color:#2563eb;" id="statModalMesin">Rp 0</div>
           <div class="m-sub" id="statModalMesinPct">0% dari total</div>
         </div>
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;">🏛️</div>
+          <div class="m-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></svg></div>
           <div class="m-label">Modal — Aset Tetap Lainnya</div>
           <div class="m-val" style="color:#6366f1;" id="statModalAset">Rp 0</div>
           <div class="m-sub" id="statModalAsetPct">0% dari total</div>
         </div>
         <!-- Operasional dibagi 2 -->
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(147,51,234,0.1);color:#9333ea;">⚙️</div>
+          <div class="m-icon" style="background:rgba(147,51,234,0.1);color:#9333ea;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
           <div class="m-label">Operasional — Barang &amp; Jasa</div>
           <div class="m-val" style="color:#9333ea;" id="statOperBarang">Rp 0</div>
           <div class="m-sub" id="statOperBarangPct">0% dari total</div>
         </div>
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;">👤</div>
+          <div class="m-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
           <div class="m-label">Operasional — Belanja Pegawai</div>
           <div class="m-val" style="color:#a855f7;" id="statOperPegawai">Rp 0</div>
           <div class="m-sub" id="statOperPegawaiPct">0% dari total</div>
         </div>
         <!-- Baris 3: Pajak dibagi 2 -->
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">🧾</div>
+          <div class="m-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           <div class="m-label">Pajak SIPLah</div>
           <div class="m-val" style="color:#d97706;" id="statPajakSiplah">Rp 0</div>
           <div class="m-sub">Setor dari Transaksi SIPLah</div>
         </div>
         <div class="m-card">
-          <div class="m-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">📋</div>
+          <div class="m-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div>
           <div class="m-label">Pajak Non-SIPLah</div>
           <div class="m-val" style="color:#ef4444;" id="statPajakNonSiplah">Rp 0</div>
           <div class="m-sub">Setor PPh / PPN Non-SIPLah</div>
         </div>
         <div class="m-card" style="grid-column:span 2;">
-          <div class="m-icon" style="background:rgba(245,158,11,0.08);color:#f59e0b;">💳</div>
+          <div class="m-icon" style="background:rgba(245,158,11,0.08);color:#f59e0b;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
           <div class="m-label">Total Pajak (SIPLah + Non-SIPLah)</div>
           <div class="m-val" style="color:#d97706;" id="statTotalPajak">Rp 0</div>
           <div class="m-sub">Dihitung dari transaksi BKU (bukan SPMU)</div>
@@ -1020,13 +1055,13 @@
       <!-- CHARTS -->
       <div class="charts-row">
         <div class="c-card">
-          <div class="c-title">📈 Realisasi Belanja per Bulan</div>
+          <div class="c-title">Realisasi Belanja per Bulan</div>
           <div class="chart-wrapper">
             <canvas id="barChart"></canvas>
           </div>
         </div>
         <div class="c-card">
-          <div class="c-title">🍩 Komposisi Belanja</div>
+          <div class="c-title">Komposisi Belanja</div>
           <div class="chart-wrapper">
             <canvas id="donutChart"></canvas>
           </div>
@@ -1035,11 +1070,11 @@
 
       <!-- TABS ADMINISTRATOR -->
       <div class="tabs-bar">
-        <button type="button" class="tab-btn active" id="tabActBtn" onclick="switchView('act')">🔐 Aktivasi &amp; Kontrol Hak Akses NPSN (729 SD)</button>
-        <button type="button" class="tab-btn" id="tabKecBtn" onclick="switchView('kec')">🏢 Progres 29 Kecamatan</button>
-        <button type="button" class="tab-btn" id="tabListBtn" onclick="switchView('list')">📋 Rincian Belanja Sekolah</button>
-        <button type="button" class="tab-btn" id="tabTaxBtn" onclick="switchView('tax')">🏛️ Rekap &amp; Audit Pajak</button>
-        <button type="button" class="tab-btn" id="tabRankBtn" onclick="switchView('rank')">🏆 Leaderboard Kepatuhan</button>
+        <button type="button" class="tab-btn active" id="tabActBtn" onclick="switchView('act')">Aktivasi &amp; Kontrol Hak Akses NPSN (729 SD)</button>
+        <button type="button" class="tab-btn" id="tabKecBtn" onclick="switchView('kec')">Progres 29 Kecamatan</button>
+        <button type="button" class="tab-btn" id="tabListBtn" onclick="switchView('list')">Rincian Belanja Sekolah</button>
+        <button type="button" class="tab-btn" id="tabTaxBtn" onclick="switchView('tax')">Rekap &amp; Audit Pajak</button>
+        <button type="button" class="tab-btn" id="tabRankBtn" onclick="switchView('rank')">Leaderboard Kepatuhan</button>
       </div>
 
       <!-- VIEW KECAMATAN (SPLIT PANEL PER KECAMATAN) -->
@@ -1049,10 +1084,10 @@
           <!-- SIDEBAR NAVIGASI KECAMATAN -->
           <div class="kec-sidebar">
             <div class="kec-sidebar-header">
-              <h3>📍 29 Kecamatan</h3>
+              <h3> 29 Kecamatan</h3>
             </div>
             <div class="kec-search-box">
-              <input type="text" id="kecSidebarSearch" placeholder="🔍 Cari kecamatan..." oninput="filterKecSidebar()">
+              <input type="text" id="kecSidebarSearch" placeholder=" Cari kecamatan..." oninput="filterKecSidebar()">
             </div>
             <div class="kec-nav-list" id="kecNavList"></div>
           </div>
@@ -1061,7 +1096,7 @@
           <div class="kec-detail-panel" id="kecDetailPanel">
             <!-- Diisi oleh JS -->
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; color:var(--muted); gap:12px;">
-              <div style="font-size:48px;">📍</div>
+              <div style="font-size:48px;"></div>
               <div style="font-weight:700; font-size:15px;">Pilih kecamatan dari daftar di kiri</div>
               <div style="font-size:12px;">Panel monitoring detail akan ditampilkan di sini</div>
             </div>
@@ -1073,8 +1108,8 @@
       <section id="viewSekolah" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
           <div style="display:flex; gap:8px;">
-            <button type="button" class="btn-subview active" id="btnModeHierarki" onclick="switchSekolahMode('hierarchy')">🏛️ Hirarki Kecamatan (29 Kec → SD → BKU)</button>
-            <button type="button" class="btn-subview" id="btnModeCards" onclick="switchSekolahMode('cards')">🏫 Kartu Kendali Satuan Pendidikan (<span id="countSdUnique">0</span> SD)</button>
+            <button type="button" class="btn-subview active" id="btnModeHierarki" onclick="switchSekolahMode('hierarchy')">Hirarki Kecamatan (29 Kec → SD → BKU)</button>
+            <button type="button" class="btn-subview" id="btnModeCards" onclick="switchSekolahMode('cards')">Kartu Kendali Satuan Pendidikan (<span id="countSdUnique">0</span> SD)</button>
           </div>
           <div style="font-size:12px; color:var(--muted); font-weight:600;">
             Pengawasan: <b>729 SD</b> di <b>29 Kecamatan</b>
@@ -1104,9 +1139,9 @@
             <label for="filterKepatuhan">Kepatuhan 12 Bulan</label>
             <select id="filterKepatuhan" class="filter-select" onchange="renderTable()">
               <option value="all">Semua Kepatuhan</option>
-              <option value="complete">🟢 Tuntas 12 Bulan (100%)</option>
-              <option value="sem1">🔵 Minimal Semester 1 (≥6 Bulan)</option>
-              <option value="partial">🟡 Parsial / Berjalan (1 - 11 Bulan)</option>
+              <option value="complete">Tuntas 12 Bulan (100%)</option>
+              <option value="sem1">Minimal Semester 1 (≥6 Bulan)</option>
+              <option value="partial">Parsial / Berjalan (1 - 11 Bulan)</option>
             </select>
           </div>
           <div class="filter-group" style="flex: 1;">
@@ -1120,12 +1155,12 @@
         <div id="wrapHierarki" class="table-card">
           <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <h2>📑 Rekapitulasi Realisasi: Kecamatan → Satuan Pendidikan → Berkas BKU</h2>
+              <h2> Rekapitulasi Realisasi: Kecamatan → Satuan Pendidikan → Berkas BKU</h2>
               <span id="dataCount" style="font-size: 12px; color: var(--muted); font-weight: 700; background: rgba(0,0,0,0.04); padding: 5px 12px; border-radius: 8px;">0 BKU</span>
             </div>
             <div style="display:flex; gap:8px;">
-              <button type="button" class="btn-outline" onclick="expandAllRows(true)">📂 Buka Semua</button>
-              <button type="button" class="btn-outline" onclick="expandAllRows(false)">📁 Tutup Semua</button>
+              <button type="button" class="btn-outline" onclick="expandAllRows(true)">Buka Semua</button>
+              <button type="button" class="btn-outline" onclick="expandAllRows(false)">Tutup Semua</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -1164,25 +1199,25 @@
       <section id="viewPajak" style="display:none;">
         <div class="metric-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
           <div class="m-card">
-            <div class="m-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">💳</div>
+            <div class="m-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;"></div>
             <div class="m-label">Total Potongan Pajak</div>
             <div class="m-val" style="color: #d97706;" id="taxStatTotal">Rp 0</div>
             <div class="m-sub">Akumulasi Seluruh BKU</div>
           </div>
           <div class="m-card">
-            <div class="m-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">🏛️</div>
+            <div class="m-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;"></div>
             <div class="m-label">Pajak Non-SIPLah</div>
             <div class="m-val" style="color: #2563eb;" id="taxStatNonSiplah">Rp 0</div>
             <div class="m-sub">Setoran SSPN (PPN &amp; PPh)</div>
           </div>
           <div class="m-card">
-            <div class="m-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">🛒</div>
+            <div class="m-icon" style="background: rgba(16,185,129,0.1); color: #10b981;"></div>
             <div class="m-label">Pajak SIPLah</div>
             <div class="m-val" style="color: #10b981;" id="taxStatSiplah">Rp 0</div>
             <div class="m-sub">Dipungut Sistem Mitra</div>
           </div>
           <div class="m-card">
-            <div class="m-icon" style="background: rgba(147,51,234,0.1); color: #9333ea;">📑</div>
+            <div class="m-icon" style="background: rgba(147,51,234,0.1); color: #9333ea;"></div>
             <div class="m-label">Frekuensi Pemotongan</div>
             <div class="m-val" style="color: #9333ea;" id="taxStatCount">0 Transaksi</div>
             <div class="m-sub">Total Bukti Potong Pajak</div>
@@ -1212,13 +1247,13 @@
             <label for="taxSearch">Cari Sekolah / NPSN</label>
             <input type="text" id="taxSearch" class="search-input" placeholder="Cari nama sekolah, NPSN..." oninput="renderTaxTable()">
           </div>
-          <button type="button" class="btn-h btn-excel" onclick="exportTaxExcel()">📥 Unduh CSV Pajak</button>
+          <button type="button" class="btn-h btn-excel" onclick="exportTaxExcel()">Unduh CSV Pajak</button>
         </div>
 
         <div class="table-card">
           <div class="table-header">
             <div style="display:flex; align-items:center; gap:10px;">
-              <h2>💳 Rekapitulasi Pajak Belanja BOS per Sekolah</h2>
+              <h2> Rekapitulasi Pajak Belanja BOS per Sekolah</h2>
               <span id="taxDataCount" style="font-size: 12px; color: var(--muted); font-weight: 700; background: rgba(0,0,0,0.04); padding: 5px 12px; border-radius: 8px;">0 BKU</span>
             </div>
           </div>
@@ -1249,14 +1284,14 @@
         <div class="lb-grid">
           <div class="lb-card">
             <div class="lb-header">
-              <h3>🏆 5 Kecamatan Tertinggi Kepatuhan</h3>
+              <h3> 5 Kecamatan Tertinggi Kepatuhan</h3>
               <span class="badge badge-success">Kinerja Unggul</span>
             </div>
             <div id="topRankContainer"></div>
           </div>
           <div class="lb-card">
             <div class="lb-header">
-              <h3>⚠️ 5 Kecamatan Butuh Pendampingan</h3>
+              <h3>⚠ 5 Kecamatan Butuh Pendampingan</h3>
               <span class="badge badge-danger">Perlu Atensi</span>
             </div>
             <div id="bottomRankContainer"></div>
@@ -1264,7 +1299,7 @@
         </div>
 
         <div class="table-card" style="padding:24px; margin-top:20px;">
-          <h3 style="font-size:15px; font-weight:800; margin-bottom:16px;">📊 Analisis Rasio Belanja &amp; Potongan Pajak BKU</h3>
+          <h3 style="font-size:15px; font-weight:800; margin-bottom:16px;">Analisis Rasio Belanja &amp; Potongan Pajak BKU</h3>
           <div id="categoryBreakdownStats" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;"></div>
         </div>
       </section>
@@ -1275,7 +1310,7 @@
         <div class="act-hero">
           <div class="act-hero-info">
             <h2>
-              <span>🔐</span>
+              <span></span>
               <span>MANAJEMEN &amp; KONTROL AKTIVASI LOGIN NPSN</span>
             </h2>
             <p>
@@ -1284,13 +1319,13 @@
           </div>
           <div class="act-hero-actions">
             <button type="button" class="btn-act-batch btn-act-batch-all" onclick="batchActivateFiltered(true)">
-              <span>⚡ Aktifkan Semua Terfilter</span>
+              <span> Aktifkan Semua Terfilter</span>
             </button>
             <button type="button" class="btn-act-batch btn-act-batch-deact" onclick="batchActivateFiltered(false)">
-              <span>🔒 Kunci Semua Terfilter</span>
+              <span> Kunci Semua Terfilter</span>
             </button>
             <button type="button" class="btn-act-batch btn-act-batch-export" onclick="exportActivationExcel()">
-              <span>📥 Export Status Excel</span>
+              <span> Export Status Excel</span>
             </button>
           </div>
         </div>
@@ -1298,7 +1333,7 @@
         <!-- 4 Stat Metric Cards -->
         <div class="act-stat-grid">
           <div class="act-stat-card">
-            <div class="act-stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">🏫</div>
+            <div class="act-stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;"></div>
             <div>
               <div class="act-stat-label">Total Sekolah Terdata</div>
               <div class="act-stat-val" style="color:var(--primary);">729 SD</div>
@@ -1314,7 +1349,7 @@
             </div>
           </div>
           <div class="act-stat-card">
-            <div class="act-stat-icon" style="background:rgba(239,68,68,0.1); color:#ef4444;">🔒</div>
+            <div class="act-stat-icon" style="background:rgba(239,68,68,0.1); color:#ef4444;"></div>
             <div>
               <div class="act-stat-label">NPSN Terkunci (Belum Aktif)</div>
               <div class="act-stat-val" style="color:#ef4444;" id="actStatInactive">729 SD</div>
@@ -1322,7 +1357,7 @@
             </div>
           </div>
           <div class="act-stat-card">
-            <div class="act-stat-icon" style="background:rgba(147,51,234,0.1); color:#9333ea;">🗄️</div>
+            <div class="act-stat-icon" style="background:rgba(147,51,234,0.1); color:#9333ea;"></div>
             <div>
               <div class="act-stat-label">Sinkronisasi Database</div>
               <div class="act-stat-val" style="color:#9333ea; font-size:16px;">SQLite Realtime</div>
@@ -1343,13 +1378,13 @@
             <label for="actFilterStatus">Status Akses Login</label>
             <select id="actFilterStatus" class="filter-select" onchange="onActFilterChange()">
               <option value="all">Semua Status (Aktif &amp; Terkunci)</option>
-              <option value="active">🟢 Hanya Yang AKTIF (Bisa Login)</option>
-              <option value="inactive">🔴 Hanya Yang TERKUNCI (Belum Aktif)</option>
+              <option value="active">Hanya Yang AKTIF (Bisa Login)</option>
+              <option value="inactive">Hanya Yang TERKUNCI (Belum Aktif)</option>
             </select>
           </div>
           <div class="filter-group" style="flex:1;">
             <label for="actSearchInput">Pencarian NPSN / Nama Sekolah</label>
-            <input type="text" id="actSearchInput" class="search-input" placeholder="🔍 Ketik 8 digit NPSN atau nama sekolah (contoh: 20604911 / SDN KRIAN)..." oninput="onActSearchInput()">
+            <input type="text" id="actSearchInput" class="search-input" placeholder=" Ketik 8 digit NPSN atau nama sekolah (contoh: 20604911 / SDN KRIAN)..." oninput="onActSearchInput()">
           </div>
           <div class="filter-group" style="width:130px;">
             <label for="actRowsPerPage">Tampilkan</label>
@@ -1367,7 +1402,7 @@
         <div class="table-card">
           <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <h2>📋 Daftar Hak Akses Satuan Pendidikan</h2>
+              <h2> Daftar Hak Akses Satuan Pendidikan</h2>
               <span id="actTableFilteredCount" style="font-size:12px; color:var(--muted); font-weight:700; background:rgba(0,0,0,0.04); padding:5px 12px; border-radius:8px;">0 Sekolah</span>
             </div>
             <div style="font-size:12px; color:var(--muted); font-weight:600;">
@@ -1452,13 +1487,13 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
         <div class="filter-pills" style="margin-bottom:0;" id="modalFilterPills">
           <button type="button" class="pill-btn active" id="pillAll" onclick="setModalFilter('ALL')">Semua (<span id="mCountAll">0</span>)</button>
-          <button type="button" class="pill-btn" id="pillBelanja" onclick="setModalFilter('BELANJA')">🛒 Belanja (<span id="mCountBelanja">0</span>)</button>
-          <button type="button" class="pill-btn" id="pillPajak" onclick="setModalFilter('PAJAK')">💳 Pajak (<span id="mCountPajak">0</span>)</button>
-          <button type="button" class="pill-btn" id="pillMutasi" onclick="setModalFilter('MUTASI')">🏧 Mutasi (<span id="mCountMutasi">0</span>)</button>
+          <button type="button" class="pill-btn" id="pillBelanja" onclick="setModalFilter('BELANJA')">Belanja (<span id="mCountBelanja">0</span>)</button>
+          <button type="button" class="pill-btn" id="pillPajak" onclick="setModalFilter('PAJAK')">Pajak (<span id="mCountPajak">0</span>)</button>
+          <button type="button" class="pill-btn" id="pillMutasi" onclick="setModalFilter('MUTASI')">Mutasi (<span id="mCountMutasi">0</span>)</button>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           <input type="text" id="modalSearch" placeholder="Cari transaksi..." oninput="filterModalRows()" style="padding:7px 12px; border-radius:10px; border:1.5px solid var(--border); font-size:12px; background:var(--card); color:var(--text); font-weight:500;">
-          <button type="button" class="btn-outline" onclick="exportModalCsv()">📥 Unduh CSV</button>
+          <button type="button" class="btn-outline" onclick="exportModalCsv()">Unduh CSV</button>
         </div>
       </div>
       <div style="max-height: 340px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px;">
@@ -1487,7 +1522,7 @@
             <h3 id="sdModalName">Nama Satuan Pendidikan</h3>
             <span class="badge" style="background:rgba(59,130,246,0.1); color:var(--primary); font-size:11px;" id="sdModalNpsn">NPSN: -</span>
             <span class="badge badge-success" id="sdModalProgressBadge">0/12 Bulan Lapor</span>
-            <span id="sdModalActBadge" class="badge-act-status inactive">🔒 TERKUNCI</span>
+            <span id="sdModalActBadge" class="badge-act-status inactive">TERKUNCI</span>
             <button type="button" id="sdModalActBtn" class="btn-act-toggle btn-turn-on" onclick="toggleModalSchoolActivation()">✓ Aktifkan Login</button>
           </div>
           <p id="sdModalMeta" style="font-size:12px; color:var(--muted); margin-top:5px;">Kecamatan • Alamat • Kepala Sekolah • Bendahara</p>
@@ -1514,9 +1549,9 @@
 
       <!-- Table 12 Months -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h4 style="font-size:13px; font-weight:800;">📑 Rincian Status Berkas per Bulan</h4>
+        <h4 style="font-size:13px; font-weight:800;">Rincian Status Berkas per Bulan</h4>
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn-outline" onclick="exportSchoolSummaryCsv()">📥 Unduh CSV Rekap SD</button>
+          <button type="button" class="btn-outline" onclick="exportSchoolSummaryCsv()">Unduh CSV Rekap SD</button>
         </div>
       </div>
       <div style="max-height:360px; overflow-y:auto; border:1px solid var(--border); border-radius:12px;">
@@ -1765,10 +1800,10 @@
     function classifyRow(r) {
       const u = cleanStr(r && r.uraian ? r.uraian : '');
       if (/\bsetor\b.*\b(ppn|pph|pajak)\b/i.test(u) || /transaksi\s+siplah/i.test(u) && /setor/i.test(u))
-        return { type: 'PAJAK', label: '💳 Pajak' };
+        return { type: 'PAJAK', label: ' Pajak' };
       if (/\b(tarik\s+tunai|penarikan)\b/i.test(u))
-        return { type: 'MUTASI', label: '🏧 Mutasi' };
-      return { type: 'BELANJA', label: '🛒 Belanja' };
+        return { type: 'MUTASI', label: ' Mutasi' };
+      return { type: 'BELANJA', label: ' Belanja' };
     }
 
     function calculateSchoolTotals(rows, p) {
@@ -1824,7 +1859,13 @@
        DATA LOADING
        ============================================================ */
     let lastDataHash = '';
+    function adminShowLoading(show){
+      const el = document.getElementById('adminLoading');
+      if(el) el.style.display = show ? 'block' : 'none';
+    }
+
     async function loadData(force = false){
+      adminShowLoading(true);
       try {
         let list = [];
 
@@ -1838,10 +1879,12 @@
         lastDataHash = currentHash;
         rawProjects = list;
         renderAll();
-        fetchActivations();
+        await fetchActivations();
       } catch(err) {
         console.warn('Load:', err.message);
-        fetchActivations();
+        try { await fetchActivations(); } catch(e) {}
+      } finally {
+        adminShowLoading(false);
       }
     }
 
@@ -2022,10 +2065,10 @@
       renderKecSidebar();
 
       let pColor = '#ef4444', badgeClass = 'badge-danger', badgeText = 'Belum Ada Laporan';
-      let statusIcon = '🔴';
-      if (k.progress >= 100) { pColor = '#10b981'; badgeClass = 'badge-success'; badgeText = 'Tuntas (100%)'; statusIcon = '🟢'; }
-      else if (k.progress >= 50) { pColor = '#3b82f6'; badgeClass = 'badge-info'; badgeText = `Aktif (${k.progress}%)`; statusIcon = '🔵'; }
-      else if (k.progress > 0) { pColor = '#f59e0b'; badgeClass = 'badge-warning'; badgeText = `Berjalan (${k.progress}%)`; statusIcon = '🟡'; }
+      let statusIcon = '';
+      if (k.progress >= 100) { pColor = '#10b981'; badgeClass = 'badge-success'; badgeText = 'Tuntas (100%)'; statusIcon = ''; }
+      else if (k.progress >= 50) { pColor = '#3b82f6'; badgeClass = 'badge-info'; badgeText = `Aktif (${k.progress}%)`; statusIcon = ''; }
+      else if (k.progress > 0) { pColor = '#f59e0b'; badgeClass = 'badge-warning'; badgeText = `Berjalan (${k.progress}%)`; statusIcon = ''; }
 
       // Hitung data per bulan untuk kecamatan
       const kecProjects = rawProjects.filter(p => {
@@ -2095,7 +2138,7 @@
           <tr>
             <td style="text-align:center;color:var(--muted);font-size:11px;font-weight:700;">${idx + 1}</td>
             <td style="padding:12px 14px;">
-              <div style="font-weight:800;font-size:13px;color:var(--text);">🏫 ${esc(sd.displayName)}</div>
+              <div style="font-weight:800;font-size:13px;color:var(--text);">${esc(sd.displayName)}</div>
               <div style="font-size:10px;color:var(--muted);margin-top:3px;">NPSN: <b>${esc(sd.npsn)}</b></div>
               <div class="month-matrix" style="margin-top:6px;">${monthChipsHtml}</div>
             </td>
@@ -2108,7 +2151,7 @@
             <td class="num" style="font-weight:600;color:#a855f7;font-size:12px;">${money(sPegawai)}</td>
             <td class="num" style="font-weight:600;color:#d97706;font-size:12px;">${money(sPajak)}</td>
             <td style="text-align:center;white-space:nowrap;">
-              <button type="button" class="btn-rekap-sd" onclick="openSchoolSummaryFromKec('${esc(sd.sKey)}')">📋 Rekap</button>
+              <button type="button" class="btn-rekap-sd" onclick="openSchoolSummaryFromKec('${esc(sd.sKey)}')">Rekap</button>
             </td>
           </tr>
         `;
@@ -2118,7 +2161,7 @@
         <!-- Header kecamatan -->
         <div class="kec-detail-header">
           <div class="kec-detail-title">
-            <h2>📍 Kec. ${esc(kecName.toUpperCase())}</h2>
+            <h2> Kec. ${esc(kecName.toUpperCase())}</h2>
             <p>${k.schoolCount} dari ${k.total} SD Lapor • ${k.bkuCount} Berkas BKU • Status: ${statusIcon} ${badgeText}</p>
             <div style="margin-top:12px;">
               <div class="progress-bar" style="height:10px;border-radius:9999px;">
@@ -2128,30 +2171,30 @@
             </div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="btn-h" style="background:rgba(59,130,246,0.8);color:white;" onclick="goToKecList('${esc(kecName)}')">📋 Lihat Detail Lengkap</button>
-            <button type="button" class="btn-h btn-excel" onclick="exportKecExcel('${esc(kecName)}')">📥 Export Excel</button>
+            <button type="button" class="btn-h" style="background:rgba(59,130,246,0.8);color:white;" onclick="goToKecList('${esc(kecName)}')">Lihat Detail Lengkap</button>
+            <button type="button" class="btn-h btn-excel" onclick="exportKecExcel('${esc(kecName)}')">Export Excel</button>
           </div>
         </div>
 
         <!-- Statistik ringkas kecamatan -->
         <div class="kec-stat-mini">
           <div class="kec-mini-card">
-            <small>🏫 Total SD Target</small>
+            <small> Total SD Target</small>
             <b style="color:var(--primary);">${k.total}</b>
             <span>${k.schoolCount} SD sudah lapor</span>
           </div>
           <div class="kec-mini-card">
-            <small>📊 Total BKU Masuk</small>
+            <small> Total BKU Masuk</small>
             <b style="color:#10b981;">${k.bkuCount}</b>
             <span>Berkas BKU diterima</span>
           </div>
           <div class="kec-mini-card">
-            <small>💰 Total Realisasi Belanja</small>
+            <small> Total Realisasi Belanja</small>
             <b style="color:#059669;font-size:14px;">${money(k.totalRealisasi)}</b>
             <span>Dari SPMU yang dikerjakan</span>
           </div>
           <div class="kec-mini-card">
-            <small>🧾 Total Pajak Disetor</small>
+            <small> Total Pajak Disetor</small>
             <b style="color:#d97706;font-size:14px;">${money(k.totalPajak)}</b>
             <span>SIPLah + Non-SIPLah</span>
           </div>
@@ -2160,19 +2203,19 @@
         <!-- Sub-kategori belanja -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
           <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow-sm);">
-            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">🏗️ Modal — Peralatan</div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Modal — Peralatan</div>
             <div style="font-size:15px;font-weight:900;color:#2563eb;margin-top:6px;">${money(k.totalMesin)}</div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow-sm);">
-            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">🏛️ Modal — Aset Tetap</div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Modal — Aset Tetap</div>
             <div style="font-size:15px;font-weight:900;color:#6366f1;margin-top:6px;">${money(k.totalAset)}</div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow-sm);">
-            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">⚙️ Op. Barang &amp; Jasa</div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Op. Barang &amp; Jasa</div>
             <div style="font-size:15px;font-weight:900;color:#9333ea;margin-top:6px;">${money(k.totalBarang)}</div>
           </div>
           <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow-sm);">
-            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">👤 Op. Belanja Pegawai</div>
+            <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Op. Belanja Pegawai</div>
             <div style="font-size:15px;font-weight:900;color:#a855f7;margin-top:6px;">${money(k.totalPegawai)}</div>
           </div>
         </div>
@@ -2180,7 +2223,7 @@
         <!-- Tracker 12 Bulan -->
         <div class="kec-month-tracker">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">📅 Distribusi BKU per Bulan — Kec. ${esc(kecName)}</div>
+            <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Distribusi BKU per Bulan — Kec. ${esc(kecName)}</div>
           </div>
           <div class="kec-month-grid">${monthTrackerHTML}</div>
         </div>
@@ -2189,7 +2232,7 @@
         <div class="table-card">
           <div class="table-header">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <h2>🏫 Daftar Satuan Pendidikan — Kec. ${esc(kecName)}</h2>
+              <h2> Daftar Satuan Pendidikan — Kec. ${esc(kecName)}</h2>
               <span style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,0,0,0.04);padding:5px 12px;border-radius:8px;">${schoolListSorted.length} SD</span>
             </div>
           </div>
@@ -2508,7 +2551,7 @@
         html += `
           <tr class="row-kec" onclick="toggleRows('${kId}')" style="background:rgba(59,130,246,0.06);border-top:2px solid var(--border);">
             <td colspan="4" style="font-weight:900;font-size:13px;color:var(--text);padding-left:14px;">
-              <span class="tgl" data-id="${kId}">▶</span> 📍 KEC. ${esc(kec.toUpperCase())}
+              <span class="tgl" data-id="${kId}">▶</span>  KEC. ${esc(kec.toUpperCase())}
               <span class="badge" style="background:rgba(59,130,246,0.12);color:var(--primary);font-size:11px;margin-left:8px;font-weight:700;">${kSchoolCount} SD • ${kTotalBku} Berkas BKU</span>
             </td>
             <td class="num" style="font-weight:700;color:var(--muted);font-size:12px;">${kTx}</td>
@@ -2579,7 +2622,7 @@
               </td>
               <td colspan="3" style="padding-left:12px;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                  <span style="font-weight:800;font-size:13.5px;color:var(--text);">🏫 ${esc(sdData.displayName)}</span>
+                  <span style="font-weight:800;font-size:13.5px;color:var(--text);">${esc(sdData.displayName)}</span>
                   <span class="badge" style="background:rgba(0,0,0,0.05);color:var(--text);font-size:10px;padding:2px 7px;">NPSN: ${esc(sdData.npsn)}</span>
                   <span class="badge ${progressBadgeClass}" style="font-size:10px;padding:2px 7px;">${submittedCount}/12 Bulan (${pct}%)</span>
                 </div>
@@ -2594,7 +2637,7 @@
               <td class="num" style="font-weight:700;color:#f59e0b;font-size:12px;">${money(sPajakSip)}</td>
               <td class="num" style="font-weight:700;color:#ef4444;font-size:12px;">${money(sPajakNon)}</td>
               <td style="text-align:center;white-space:nowrap;">
-                <button type="button" class="btn-rekap-sd" onclick="event.stopPropagation(); openSchoolSummary('${esc(sKey)}')">📋 Rekap SD</button>
+                <button type="button" class="btn-rekap-sd" onclick="event.stopPropagation(); openSchoolSummary('${esc(sKey)}')">Rekap SD</button>
               </td>
             </tr>
           `;
@@ -2609,18 +2652,18 @@
                 <td style="text-align:center; color:var(--muted); font-size:11px; font-weight:700;">${itemIdx + 1}</td>
                 <td style="padding-left:42px;">
                   <div style="font-weight:700; font-size:12px; color:var(--text); display:flex; align-items:center; gap:6px;">
-                    <span style="color:var(--primary);">↳ 📄</span>
+                    <span style="color:var(--primary);">↳</span>
                     <span>Laporan BKU BOS Bulan <b>${esc(pMonth)}</b></span>
                   </div>
                   <div style="font-size:11px; color:var(--muted); margin-top:2px; display:flex; align-items:center; gap:6px;">
-                    <span>📁 Berkas: <b>${esc(p.file?.name || p.name || 'BKU.xlsx')}</b></span>
+                    <span>Berkas: <b>${esc(p.file?.name || p.name || 'BKU.xlsx')}</b></span>
                     ${fileSizeStr ? `<span>(${fileSizeStr})</span>` : ''}
                   </div>
                 </td>
                 <td style="font-size:11px; color:var(--muted); white-space:nowrap;">
-                  🕒 ${p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '-'}
+                  ${p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '-'}
                 </td>
-                <td><span class="badge badge-month" style="font-weight:700;">📅 ${esc(pMonth)}</span></td>
+                <td><span class="badge badge-month" style="font-weight:700;">${esc(pMonth)}</span></td>
                 <td class="num" style="font-weight:600;font-size:12px;">${t.txBelanjaCount}</td>
                 <td class="num" style="font-weight:700;color:#059669;font-size:12.5px;">${money(t.belanjaMurni)}</td>
                 <td class="num" style="font-weight:600;color:#2563eb;font-size:12px;">${money(t.modalMesin)}</td>
@@ -2630,8 +2673,8 @@
                 <td class="num" style="font-weight:600;color:#f59e0b;font-size:12px;">${money(t.pajakSiplah)}</td>
                 <td class="num" style="font-weight:600;color:#ef4444;font-size:12px;">${money(t.pajakNonSiplah)}</td>
                 <td style="text-align:center; white-space:nowrap;">
-                  <button type="button" class="btn-act btn-detail" title="Lihat Rincian Transaksi BKU" onclick="event.stopPropagation(); openDetail('${esc(p.id)}')">🔍 Detail</button>
-                  <button type="button" class="btn-act btn-del" title="Hapus Berkas BKU ini" onclick="event.stopPropagation(); deleteFromMon('${esc(p.id)}', '${esc(sdData.displayName)} - Bulan ${esc(pMonth)}')">🗑</button>
+                  <button type="button" class="btn-act btn-detail" title="Lihat Rincian Transaksi BKU" onclick="event.stopPropagation(); openDetail('${esc(p.id)}')">Detail</button>
+                  <button type="button" class="btn-act btn-del" title="Hapus Berkas BKU ini" onclick="event.stopPropagation(); deleteFromMon('${esc(p.id)}', '${esc(sdData.displayName)} - Bulan ${esc(pMonth)}')"></button>
                 </td>
               </tr>
             `;
@@ -2680,9 +2723,9 @@
               <div>
                 <div class="sd-card-top">
                   <div>
-                    <h3 style="font-size:14px; font-weight:800; color:var(--text);">🏫 ${esc(sd.displayName)}</h3>
+                    <h3 style="font-size:14px; font-weight:800; color:var(--text);">${esc(sd.displayName)}</h3>
                     <div style="font-size:11px; color:var(--muted); margin-top:3px;">
-                      📍 Kec. ${esc(sd.kecamatan)} • NPSN: <b>${esc(sd.npsn)}</b>
+                      Kec. ${esc(sd.kecamatan)} • NPSN: <b>${esc(sd.npsn)}</b>
                     </div>
                   </div>
                   <span class="badge ${badgeClass}" style="font-size:10.5px;">${count}/12 Bulan (${pct}%)</span>
@@ -2726,7 +2769,7 @@
 
               <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:12px; margin-top:8px;">
                 <span style="font-size:11px; color:var(--muted); font-weight:600;">${sd.items.length} Berkas BKU</span>
-                <button type="button" class="btn-rekap-sd" onclick="openSchoolSummary('${esc(sd.schoolKey)}')">📋 Kartu Kendali &amp; Rekap SD</button>
+                <button type="button" class="btn-rekap-sd" onclick="openSchoolSummary('${esc(sd.schoolKey)}')">Kartu Kendali &amp; Rekap SD</button>
               </div>
             </div>
           `;
@@ -2787,7 +2830,7 @@
           return `
             <div style="text-align:center; padding:8px 4px; border-radius:10px; background:${bg}; border:${border};">
               <div style="font-size:11px; font-weight:800; color:${color};">${short}</div>
-              <div style="font-size:10px; margin-top:2px;">${has ? '✅' : '⏳'}</div>
+              <div style="font-size:10px; margin-top:2px;">${has ? '' : '⏳'}</div>
             </div>
           `;
         }).join('');
@@ -2803,16 +2846,16 @@
             return `
               <tr style="background:rgba(16,185,129,0.03);">
                 <td style="text-align:center; font-weight:700; color:var(--muted);">${idx + 1}</td>
-                <td style="font-weight:800; color:var(--primary);">📅 ${m}</td>
-                <td><span class="badge badge-success" style="font-size:10px;">✅ Sudah Lapor</span></td>
-                <td style="font-size:11px; color:var(--muted);">📁 ${esc(item.file?.name || item.name || 'BKU.xlsx')}</td>
+                <td style="font-weight:800; color:var(--primary);">${m}</td>
+                <td><span class="badge badge-success" style="font-size:10px;">Sudah Lapor</span></td>
+                <td style="font-size:11px; color:var(--muted);">${esc(item.file?.name || item.name || 'BKU.xlsx')}</td>
                 <td class="num" style="font-weight:600; font-size:12px;">${t.txBelanjaCount}</td>
                 <td class="num" style="font-weight:800; color:#059669;">${money(t.belanjaMurni)}</td>
                 <td class="num" style="font-weight:600; color:#2563eb;">${money(t.modal)}</td>
                 <td class="num" style="font-weight:600; color:#9333ea;">${money(t.barang)}</td>
                 <td class="num" style="font-weight:600; color:#d97706;">${money(t.pajak)}</td>
                 <td style="text-align:center;">
-                  <button type="button" class="btn-act btn-detail" onclick="openDetail('${esc(item.id)}')">🔍 Buka</button>
+                  <button type="button" class="btn-act btn-detail" onclick="openDetail('${esc(item.id)}')">Buka</button>
                 </td>
               </tr>
             `;
@@ -2820,7 +2863,7 @@
             return `
               <tr style="opacity:0.65;">
                 <td style="text-align:center; color:var(--muted);">${idx + 1}</td>
-                <td style="font-weight:600; color:var(--muted);">📅 ${m}</td>
+                <td style="font-weight:600; color:var(--muted);">${m}</td>
                 <td><span class="badge badge-warning" style="font-size:10px;">⏳ Belum Lapor</span></td>
                 <td style="font-size:11px; color:var(--muted); font-style:italic;">Belum ada berkas BKU diunggah</td>
                 <td class="num">-</td>
@@ -3023,13 +3066,13 @@
             <td style="font-weight:700; color:var(--primary); font-size:13px;">${esc(row.school)}</td>
             <td style="font-size:12px; color:var(--muted);">${esc(row.npsn)}</td>
             <td style="font-size:12px;">${esc(row.kecamatan)}</td>
-            <td><span class="badge badge-month">📅 ${esc(row.bulan)}</span></td>
+            <td><span class="badge badge-month">${esc(row.bulan)}</span></td>
             <td class="num" style="font-weight:800; color:#d97706; font-size:13px;">${money(row.totalPajak)}</td>
             <td class="num" style="font-weight:600; color:#2563eb; font-size:12px;">${money(row.nonSiplah)}</td>
             <td class="num" style="font-weight:600; color:#10b981; font-size:12px;">${money(row.siplah)}</td>
             <td class="num" style="font-weight:600; font-size:12px;">${row.txCount}</td>
             <td style="text-align:center;">
-              <button type="button" class="btn-act btn-detail" onclick="openDetail('${esc(row.id)}')">🔍 Detail</button>
+              <button type="button" class="btn-act btn-detail" onclick="openDetail('${esc(row.id)}')">Detail</button>
             </td>
           </tr>
         `;
@@ -3080,16 +3123,16 @@
         topCont.innerHTML = top5.map((k, idx) => {
           let rankClass = 'rank-other';
           let medal = `${idx + 1}`;
-          if (idx === 0) { rankClass = 'rank-1'; medal = '🥇'; }
-          else if (idx === 1) { rankClass = 'rank-2'; medal = '🥈'; }
-          else if (idx === 2) { rankClass = 'rank-3'; medal = '🥉'; }
+          if (idx === 0) { rankClass = 'rank-1'; medal = ''; }
+          else if (idx === 1) { rankClass = 'rank-2'; medal = ''; }
+          else if (idx === 2) { rankClass = 'rank-3'; medal = ''; }
 
           return `
             <div class="lb-item" style="cursor:pointer;" onclick="selectKec('${esc(k.name)}')">
               <div style="display:flex; align-items:center;">
                 <div class="lb-rank ${rankClass}">${medal}</div>
                 <div>
-                  <div style="font-weight:800; font-size:13px;">📍 ${esc(k.name)}</div>
+                  <div style="font-weight:800; font-size:13px;">${esc(k.name)}</div>
                   <div style="font-size:11px; color:var(--muted);">${k.schoolCount} dari ${k.total} SD (${k.bkuCount} BKU)</div>
                 </div>
               </div>
@@ -3108,9 +3151,9 @@
           return `
             <div class="lb-item" style="cursor:pointer;" onclick="selectKec('${esc(k.name)}')">
               <div style="display:flex; align-items:center;">
-                <div class="lb-rank rank-other">⚠️</div>
+                <div class="lb-rank rank-other">⚠</div>
                 <div>
-                  <div style="font-weight:800; font-size:13px;">📍 ${esc(k.name)}</div>
+                  <div style="font-weight:800; font-size:13px;">${esc(k.name)}</div>
                   <div style="font-size:11px; color:var(--muted);">${k.schoolCount} dari ${k.total} SD Lapor</div>
                 </div>
               </div>
@@ -3134,17 +3177,17 @@
       if (statsCont) {
         statsCont.innerHTML = `
           <div class="bku-cat-box">
-            <small>🏗️ Proporsi Belanja Modal</small>
+            <small> Proporsi Belanja Modal</small>
             <b style="color:#2563eb;">${money(modalSum)}</b>
             <span style="font-size:12px; font-weight:700; color:var(--muted);">${modalPct}% dari total belanja</span>
           </div>
           <div class="bku-cat-box">
-            <small>⚙️ Proporsi Belanja Operasional</small>
+            <small> Proporsi Belanja Operasional</small>
             <b style="color:#9333ea;">${money(operSum)}</b>
             <span style="font-size:12px; font-weight:700; color:var(--muted);">${operPct}% dari total belanja</span>
           </div>
           <div class="bku-cat-box">
-            <small>📈 Rata-Rata Belanja per Berkas BKU</small>
+            <small> Rata-Rata Belanja per Berkas BKU</small>
             <b style="color:#059669;">${money(avgPerBku)}</b>
             <span style="font-size:12px; font-weight:700; color:var(--muted);">Berdasarkan ${rawProjects.length} BKU terdaftar</span>
           </div>
@@ -3562,7 +3605,7 @@
         if (targetActive) {
           showActToast(`✓ DIAKTIFKAN: [${npsn}] ${body.school_name} sekarang dapat login`, 'success');
         } else {
-          showActToast(`🔒 DIKUNCI: [${npsn}] ${body.school_name} dinonaktifkan (login diblokir)`, 'info');
+          showActToast(` DIKUNCI: [${npsn}] ${body.school_name} dinonaktifkan (login diblokir)`, 'info');
         }
       } catch (err) {
         showActToast(`Gagal merubah status: ${err.message}`, 'error');
@@ -3584,7 +3627,7 @@
           `PIN untuk [${npsn}] ${schoolName} berhasil dibuat.\nSalin dan sampaikan PIN ini ke sekolah secara aman (jangan broadcast publik):`,
           json.pin
         );
-        showActToast(`🔑 PIN baru dibuat untuk [${npsn}] ${schoolName}`, 'success');
+        showActToast(` PIN baru dibuat untuk [${npsn}] ${schoolName}`, 'success');
         renderActivationTable();
       } catch (err) {
         showActToast(`Gagal membuat PIN: ${err.message}`, 'error');
@@ -3679,7 +3722,7 @@
         tbody.innerHTML = `
           <tr>
             <td colspan="7" style="text-align:center; padding:48px; color:var(--muted);">
-              <div style="font-size:36px; margin-bottom:10px;">🔍</div>
+              <div style="font-size:36px; margin-bottom:10px;"></div>
               <div style="font-weight:700; font-size:14px;">Tidak ada sekolah yang cocok</div>
               <div style="font-size:12px; margin-top:4px;">Coba ubah kata kunci pencarian atau sesuaikan filter kecamatan/status.</div>
             </td>
@@ -3715,7 +3758,7 @@
 
         const statusBadge = isActive
           ? `<span class="badge-act-status active">✓ AKTIF (Bisa Login)</span>`
-          : `<span class="badge-act-status inactive">🔒 TERKUNCI (Ditolak)</span>`;
+          : `<span class="badge-act-status inactive">TERKUNCI (Ditolak)</span>`;
 
         const actionBtn = isActive
           ? `<button type="button" class="btn-act-toggle btn-turn-off" onclick="toggleActivation('${esc(s.npsn)}', '${esc(s.name)}', '${esc(s.kecamatan)}')">
@@ -3727,7 +3770,7 @@
 
         const pinBtn = `<button type="button" class="btn-act-toggle" style="background:rgba(99,102,241,0.08); color:#6366f1; border:1px solid rgba(99,102,241,0.25); margin-top:6px;"
             onclick="handleSetPin('${esc(s.npsn)}', '${esc(s.name)}')" title="${act && act.pin_set ? 'Reset PIN sekolah ini' : 'Sekolah ini belum punya PIN — buat sekarang'}">
-            <span>${act && act.pin_set ? '🔑 Reset PIN' : '🔑 Buat PIN'}</span>
+            <span>${act && act.pin_set ? ' Reset PIN' : ' Buat PIN'}</span>
           </button>`;
 
         html += `
@@ -3736,7 +3779,7 @@
             <td>
               <span class="npsn-pill" title="Klik untuk salin NPSN" onclick="copyNpsnToClipboard('${esc(s.npsn)}')">
                 <span>${esc(s.npsn)}</span>
-                <span class="npsn-copy-icon">📋</span>
+                <span class="npsn-copy-icon"></span>
               </span>
             </td>
             <td>
@@ -3873,7 +3916,7 @@
 
       if (badge) {
         badge.className = `badge-act-status ${isActive ? 'active' : 'inactive'}`;
-        badge.innerHTML = isActive ? '✓ AKTIF (Bisa Login)' : '🔒 TERKUNCI (Belum Aktif)';
+        badge.innerHTML = isActive ? '✓ AKTIF (Bisa Login)' : ' TERKUNCI (Belum Aktif)';
       }
       if (btn) {
         btn.className = `btn-act-toggle ${isActive ? 'btn-turn-off' : 'btn-turn-on'}`;
@@ -3900,7 +3943,7 @@
     <div class="modal-content" style="max-width:440px; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:26px; box-shadow:0 25px 60px rgba(0,0,0,0.4);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px;">
         <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
-          <span>🔑</span>
+          <span></span>
           <span>Ganti Kata Sandi Administrator</span>
         </h3>
         <button type="button" class="modal-close" onclick="closeChangePasswordModal()">✕</button>

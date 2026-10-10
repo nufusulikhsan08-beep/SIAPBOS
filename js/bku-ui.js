@@ -59,7 +59,7 @@ function mrLoading(stage,detail,progress){
   $('mrLoadingText').textContent=stage||'MR. LOADING sedang bekerja…';
   $('mrLoadingDetail').textContent=detail||'Mohon tunggu, data sedang dibaca dengan teliti.';
   $('mrLoadingProgress').style.width=Math.max(4,Math.min(100,Number(progress)||4))+'%';
-  $('mrLoadingAvatar').innerHTML='<div class="mr-spinner"></div><div class="mr-face">👨‍💼</div>';
+  $('mrLoadingAvatar').innerHTML='<div class="mr-spinner"></div>';
 }
 function mrLoadingSuccess(detail){
   const ov=$('mrLoadingOverlay');
@@ -68,7 +68,7 @@ function mrLoadingSuccess(detail){
   $('mrLoadingText').textContent='MR. LOADING BERHASIL MEMBACA DATA BKU';
   $('mrLoadingDetail').textContent=detail||'Data BKU berhasil dibaca dan divalidasi.';
   $('mrLoadingProgress').style.width='100%';
-  $('mrLoadingAvatar').innerHTML='<div class="mr-face">👍</div>';
+  $('mrLoadingAvatar').innerHTML='<svg class="mr-check" viewBox="0 0 52 52"><path d="M15 27 l8 8 l15 -17"/></svg>';
   return new Promise(resolve=>setTimeout(()=>{ov.classList.remove('show');ov.setAttribute('aria-hidden','true');resolve();},1300));
 }
 function mrLoadingError(detail){
@@ -78,7 +78,7 @@ function mrLoadingError(detail){
   $('mrLoadingText').textContent='MR. LOADING GAGAL MEMBACA DATA';
   $('mrLoadingDetail').textContent=detail||'Pembacaan berhenti. Periksa file dan coba lagi.';
   $('mrLoadingProgress').style.width='100%';
-  $('mrLoadingAvatar').innerHTML='<div class="mr-face">❌</div>';
+  $('mrLoadingAvatar').innerHTML='<svg class="mr-x" viewBox="0 0 52 52"><path d="M16 16 l20 20 M36 16 l-20 20"/></svg>';
   setTimeout(()=>{ov.classList.remove('show');ov.setAttribute('aria-hidden','true');},2200);
 }
 

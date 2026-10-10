@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SIAP BOS — Dashboard Simple — Data Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
+<style>
+.preview-shell{max-width:1440px;margin:auto;padding:22px 28px;background:#f8fafc}
+.preview-banner{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0 16px;color:#475569;font:12px/1.5 Inter,Arial,sans-serif}
+.preview-banner b{color:#3159d9}.preview-banner button{font:inherit;cursor:pointer;border:1px solid #cbd5e1;border-radius:8px;padding:5px 10px;background:white;color:#334155}
+@media(max-width:600px){.preview-shell{padding:14px}}
+</style></head>
+<body><main class="preview-shell"><div class="preview-banner"><span><b>SIAP BOS · PREVIEW</b> — Data demo, bukan data sekolah. Tata letak dan interaksi memakai kode dashboard asli.</span><button id="demoEmptyToggle" type="button">Uji data kosong / demo</button></div>        <div id="tabDashboard" class="tab-panel active dashboard-group" role="tabpanel">
+          <section class="card hero dash-brand-hero">
+            <div class="top">
+              <div class="dash-brand-copy">
+                <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS"
+                  style="width:64px; height:64px; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(37,99,235,0.3)); flex-shrink:0; margin-top:4px;">
+                <div>
+                  <div class="eyebrow">ARKAS &bull; FINANCIAL DOCUMENT AUTOMATION</div>
+                  <h1 class="title">Sistem Informasi Akuntansi &amp; Pengelolaan BOSP</h1>
+                  <div class="muted">Ekstrak &amp; verifikasi BKU otomatis, terbitkan Surat Perintah Mengeluarkan Uang
+                    (SPMU), cetak Kwitansi terstandar, dan audit pemotongan pajak sekolah dalam satu alur kerja terpadu.
+                  </div>
+                  <div class="creator">Dikembangkan untuk Satuan Pendidikan</div>
+                </div>
+              </div>
+              <span class="badge">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                PORTABLE &bull; DATABASE TERINTEGRASI
+              </span>
+            </div>
+            <div class="steps">
+              <span class="step"><i class="step-num">1</i> Pilih Berkas BKU</span>
+              <span class="step"><i class="step-num">2</i> Ekstrak &amp; Validasi</span>
+              <span class="step"><i class="step-num">3</i> Verifikasi Data</span>
+              <span class="step"><i class="step-num">4</i> SPMU &amp; Kwitansi</span>
+              <span class="step"><i class="step-num">5</i> Cetak Fisik A4 / PDF</span>
+            </div>
+          </section>
+          <header class="dash-simple-head">
+            <div><h2>Dashboard</h2><p>Ringkasan belanja, pajak, dan SPMU sekolah.</p><span class="dx-updated" id="dashUpdated" aria-live="polite"></span></div>
+            <div class="dash-head-actions">
+              <button id="dashGoBku" class="command-btn dash-primary" type="button">Baca BKU</button>
+              <button id="dashGoSurat" class="command-btn" type="button">Surat Perintah</button>
+              <button id="dashGoPajak" class="command-btn" type="button">Hitung Pajak</button>
+              <button id="dashboardRefreshBtn" class="dx-refresh" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4" /><path d="M21 3v6h-6" /></svg><span>Refresh</span></button>
+            </div>
+          </header>
+          <div class="dash-filterbar">
+            <label for="dashYearFilter">Tahun <select id="dashYearFilter" class="dash-select" aria-label="Filter tahun dashboard"><option value="all">Semua tahun</option></select></label>
+            <label for="dashPeriodFilter">Periode <select id="dashPeriodFilter" class="dash-select" aria-label="Filter periode dashboard">
+                  <option value="all">Semua periode</option>
+                  <optgroup label="Per Bulan">
+                    <option value="m1">Januari</option><option value="m2">Februari</option><option value="m3">Maret</option>
+                    <option value="m4">April</option><option value="m5">Mei</option><option value="m6">Juni</option>
+                    <option value="m7">Juli</option><option value="m8">Agustus</option><option value="m9">September</option>
+                    <option value="m10">Oktober</option><option value="m11">November</option><option value="m12">Desember</option>
+                  </optgroup>
+                  <optgroup label="Per Triwulan (3 bulan)">
+                    <option value="tw1">Triwulan I • Jan–Mar</option><option value="tw2">Triwulan II • Apr–Jun</option>
+                    <option value="tw3">Triwulan III • Jul–Sep</option><option value="tw4">Triwulan IV • Okt–Des</option>
+                  </optgroup>
+                  <optgroup label="Per Tahap (6 bulan)">
+                    <option value="th1">Tahap 1 • Jan–Jun</option><option value="th2">Tahap 2 • Jul–Des</option>
+                  </optgroup>
+                </select></label>
+            <button id="dashResetFilters" type="button" class="command-btn">Reset filter</button>
+            <span class="dash-filter-note">Ringkasan semua kategori; kategori dan pencarian hanya menyaring detail SPMU.</span>
+          </div>
+          <section class="dx-kpis">
+            <article class="dx-kpi k-count">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 3v5h5M9 13h6M9 17h6" />
+                </svg></div><span>Total SPMU Tersimpan</span><b id="dashProjectCount">0</b><small
+                id="dashProjectHint">Belum ada data</small>
+            </article>
+            <article class="dx-kpi k-modal">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6" />
+                </svg></div><span>Belanja Modal</span><b id="dashModalTotal">Rp 0</b><small id="dashModalPct">0% dari
+                total</small>
+            </article>
+            <article class="dx-kpi k-oper">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="7" width="18" height="13" rx="2" />
+                  <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" />
+                </svg></div><span>Belanja Operasional</span><b id="dashOperasionalTotal">Rp 0</b><small
+                id="dashOperPct">0% dari total</small>
+            </article>
+            <article class="dx-kpi k-pajak">
+              <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 5 5 19" />
+                  <circle cx="7" cy="7" r="2.5" />
+                  <circle cx="17" cy="17" r="2.5" />
+                </svg></div><span>Jumlah Pajak (Akumulasi BKU)</span><b id="dashTaxTotal">Rp 0</b><small
+                id="dashTaxDetail">Akumulasi dari 0 BKU tersimpan • SIPLah Rp 0 • Non SIPLah Rp 0</small>
+            </article>
+          </section>
+          <div class="dash-context"><span>Total belanja <b id="dashSpendTotal">Rp 0</b></span><span id="dashCoverage">0 BKU tersimpan</span></div>
+          <div class="dash-view-tabs" role="tablist" aria-label="Bagian dashboard">
+            <button type="button" id="dashTabOverview" role="tab" aria-controls="dashPanelOverview" aria-selected="true" data-dash-view="overview">Ringkasan</button>
+            <button type="button" id="dashTabRecap" role="tab" aria-controls="dashPanelRecap" aria-selected="false" tabindex="-1" data-dash-view="recap">Rekap Periode</button>
+            <button type="button" id="dashTabDetails" role="tab" aria-controls="dashPanelDetails" aria-selected="false" tabindex="-1" data-dash-view="details">Detail SPMU <span id="dashDetailCount">0</span></button>
+          </div>
+          <section id="dashPanelOverview" role="tabpanel" aria-labelledby="dashTabOverview" data-dash-panel="overview">
+            <section class="dx-row">
+            <div class="card dash-composition-card dx-donut-card">
+              <div class="section-title">Komposisi Belanja</div>
+              <div class="section-sub" id="dashCompSub">Porsi tiap kategori terhadap total pengeluaran SPMU tersimpan.</div>
+              <div id="dashComposition"></div>
+            </div>
+            <div class="card dx-tax-recap-card">
+              <div class="section-title">Rekap Pajak</div>
+              <div class="section-sub" id="dashTaxSub">Akumulasi pajak dari seluruh BKU tersimpan.</div>
+              <div class="dx-tax-recap">
+                <div class="dx-tax-box dx-tax-siplah"><span>Jumlah Pajak Siplah</span><b id="dashTaxSiplah">Rp 0</b><small id="dashTaxSiplahMeta">Transaksi SIPLah</small></div>
+                <div class="dx-tax-box dx-tax-nonsiplah"><span>Jumlah Pajak Non-Siplah</span><b id="dashTaxNonSiplah">Rp 0</b><small id="dashTaxNonSiplahMeta">Transaksi Non-SIPLah</small></div>
+              </div>
+              <details class="dash-fold"><summary>Rincian jenis pajak &amp; tren bulanan</summary><div id="dashTaxExtra"></div></details>
+            </div>
+          </section>
+            <details class="dash-fold dash-category-fold"><summary>Grafik &amp; tabel kategori belanja</summary>
+            <section class="card dashboard-view-controls">
+            <div>
+              <div class="section-title">Kategori Belanja</div>
+              <div class="section-sub">Pilih tampilan grafik dinamis atau rekap angka per kategori.</div>
+            </div>
+            <div class="view-switch category-switch" role="group" aria-label="Tampilan kategori belanja"><button type="button"
+                class="view-switch-btn active" data-view="chart">▥ Grafik</button><button type="button"
+                class="view-switch-btn" data-view="data">▤ Data</button></div>
+          </section>
+          <section id="categoryChartView" class="dashboard-grid">
+            <div class="card chart-card">
+              <div class="toolbar">
+                <div>
+                  <div class="section-title">Belanja Modal</div>
+                  <div class="section-sub">Peralatan dan Mesin • Aset Tetap Lainnya</div>
+                </div>
+              </div>
+              <div class="bar-chart" id="chartModal"></div>
+            </div>
+            <div class="card chart-card">
+              <div class="toolbar">
+                <div>
+                  <div class="section-title">Belanja Operasional</div>
+                  <div class="section-sub">Barang dan Jasa • Pegawai</div>
+                </div>
+              </div>
+              <div class="bar-chart" id="chartOperasional"></div>
+            </div>
+          </section>
+          <section id="categoryDataView" class="card dashboard-category-data" hidden>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kategori Belanja</th>
+                    <th class="num">Jumlah (Rp)</th>
+                    <th class="num">Proporsi</th>
+                  </tr>
+                </thead>
+                <tbody id="categoryDataBody"></tbody>
+              </table>
+            </div>
+          </section>
+            </details>
+            <details class="dash-fold dash-help"><summary>Panduan singkat alur kerja</summary><p>Baca BKU → ekstrak dan validasi → verifikasi data → simpan Surat Perintah / SPMU → cetak SPMU &amp; Kwitansi. Periksa pajak melalui tombol Hitung Pajak. Dashboard merangkum data tersimpan.</p></details>
+          </section>
+          <section id="dashPanelRecap" role="tabpanel" aria-labelledby="dashTabRecap" data-dash-panel="recap" hidden>
+            <section class="card dash-recap dash-recap-merged">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Rekap Periodik</div>
+                <div class="section-sub">Rekap seluruh tahun terpilih, tidak dibatasi filter periode. Klik baris untuk memilih periode; total belanja dan pajak tampil terpisah.</div>
+              </div>
+              <div class="view-switch recap-switch" role="group" aria-label="Tampilan rekap periodik">
+                <button type="button" class="view-switch-btn active" data-recap="tahap">▤ per Tahap</button>
+                <button type="button" class="view-switch-btn" data-recap="triwulan">▦ per Triwulan</button>
+              </div>
+            </div>
+            <div class="recap-panel" data-recap-panel="tahap">
+              <div class="section-sub" style="margin:10px 0 8px;">1 tahap = 6 bulan. <b id="dashRecapTahapYear"></b></div>
+              <div class="table-wrap">
+                <table class="data-table dash-recap-table">
+                  <thead>
+                    <tr>
+                      <th>Periode</th>
+                      <th>Bulan BKU</th>
+                      <th class="num">SPMU</th>
+                      <th class="num">Belanja Modal</th>
+                      <th class="num">Belanja Operasional</th>
+                      <th class="num">Total</th>
+                      <th class="num">Pajak</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashRecapTahapBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="recap-panel" data-recap-panel="triwulan" hidden>
+              <div class="section-sub" style="margin:10px 0 8px;">1 triwulan = 3 bulan. <b id="dashRecapTwYear"></b></div>
+              <div class="table-wrap">
+                <table class="data-table dash-recap-table">
+                  <thead>
+                    <tr>
+                      <th>Periode</th>
+                      <th>Bulan BKU</th>
+                      <th class="num">SPMU</th>
+                      <th class="num">Belanja Modal</th>
+                      <th class="num">Belanja Operasional</th>
+                      <th class="num">Total</th>
+                      <th class="num">Pajak</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashRecapTwBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+          </section>
+          <section id="dashPanelDetails" role="tabpanel" aria-labelledby="dashTabDetails" data-dash-panel="details" hidden>
+            <section class="card dashboard-detail">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Detail SPMU</div>
+                <div class="section-sub">Pantau pekerjaan, tujuan pembayaran, kategori, waktu penyimpanan, dan nilai
+                  setiap SPMU. Gunakan pencarian untuk menemukan data tersimpan.</div>
+              </div><input id="dashSearch" class="search" type="search"
+                placeholder="Cari pekerjaan / pembayaran / kategori / no. bukti…" aria-label="Cari rekap">
+            </div>
+            <div class="dash-detail-filter"><label for="dashCategoryFilter">Kategori SPMU</label><select id="dashCategoryFilter" aria-label="Filter kategori dashboard">
+                  <option value="all">Semua kategori</option>
+                  <option value="Belanja Modal : Peralatan dan Mesin">Modal — Peralatan &amp; Mesin</option>
+                  <option value="Belanja Modal : Aset Tetap Lainya">Modal — Aset Tetap Lainnya</option>
+                  <option value="Belanja Operasional : Barang dan Jasa">Operasional — Barang &amp; Jasa</option>
+                  <option value="Belanja Operasional : Pegawai">Operasional — Pegawai</option>
+                </select><span id="dashTableStatus" aria-live="polite"></span></div>
+            <div class="table-wrap" tabindex="0" aria-label="Tabel detail SPMU">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Pekerjaan</th>
+                    <th>Untuk Pembayaran</th>
+                    <th>Kategori</th>
+                    <th>Tanggal Simpan</th>
+                    <th class="num">Nilai Pengeluaran</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardTableBody">
+                  <tr>
+                    <td colspan="6" class="empty">Belum ada pekerjaan tersimpan.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dash-pagination">
+              <label for="dashPageSize">Baris per halaman <select id="dashPageSize"><option value="10">10</option><option value="25">25</option><option value="50">50</option></select></label>
+              <div><button id="dashPagePrev" type="button" disabled aria-label="Halaman sebelumnya">Sebelumnya</button><span id="dashPageInfo" aria-live="polite">Halaman 1 / 1</span><button id="dashPageNext" type="button" disabled aria-label="Halaman berikutnya">Berikutnya</button></div>
+            </div>
+          </section>
+          </section>
+        </div>
+</main><script>
+// Demonstration only: no login bypass, persistence, or production database access.
+window.demoMode='filled';
+const demoCategories=['Belanja Modal : Peralatan dan Mesin','Belanja Modal : Aset Tetap Lainya','Belanja Operasional : Barang dan Jasa','Belanja Operasional : Pegawai'];
+const demoAmounts=[24000000,12500000,18000000,8500000];
+const demoPurposes=['Pengadaan komputer laboratorium','Pengadaan meja dan kursi siswa','Pembelian buku dan kebutuhan pembelajaran','Pembayaran honor tenaga sekolah'];
+const demoProjects=Array.from({length:6},(_,i)=>({name:'BKU '+['Januari','Februari','Maret','April','Mei','Juli'][i]+' 2026',month:i===5?7:i+1,year:2026,state:{rawRows:[{type:'PPN',amount:1200000,siplah:true},{type:'PPh 21',amount:350000,siplah:false}],suratByBukti:Object.fromEntries(demoCategories.map((category,c)=>['B'+i+c,{category,nominal:demoAmounts[c]+i*100000,bukti:'BKU-'+String(i*4+c+1).padStart(3,'0'),untukPembayaran:demoPurposes[c],savedAt:new Date(2026,i===5?6:i,12+c).getTime()}]))}}));
+window.SPMU={
+ esc:s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])),
+ formatMoney:n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0),
+ getAllProjects:async()=>window.demoMode==='empty'?[]:demoProjects,
+ detectMonthFromProject:p=>({month:p.month,year:p.year}),projectDisplayName:p=>p.name,
+ getTaxRows:rows=>rows,getTaxSummary:rows=>({siplahTotal:rows.filter(r=>r.siplah).reduce((s,r)=>s+r.amount,0),nonSiplahTotal:rows.filter(r=>!r.siplah).reduce((s,r)=>s+r.amount,0),grandTotal:rows.reduce((s,r)=>s+r.amount,0)}),
+ setTab:name=>window.alert('Demo tampilan saja. Gunakan aplikasi utama untuk '+name+'.')
+};
+</script>
+<script src="js/dashboard.js"></script>
+<script>
+window.SPMU.renderDashboard();
+document.getElementById('demoEmptyToggle').addEventListener('click',()=>{window.demoMode=window.demoMode==='empty'?'filled':'empty';window.SPMU.renderDashboard();});
+</script></body></html>

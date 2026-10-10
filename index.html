@@ -2,22 +2,8 @@
 <html lang="id">
 
 <head>
-  <script>
-    // Pembersih otomatis data lama saat reset
-    (function () {
-      const RESET_VERSION = 'v_reset_clean_1';
-      if (localStorage.getItem('SPMU_RESET_APPLIED') !== RESET_VERSION) {
-        try {
-          localStorage.clear();
-          if (window.indexedDB) {
-            window.indexedDB.deleteDatabase('SPMU_OTOMATIS_PROJECTS');
-          }
-          localStorage.setItem('SPMU_RESET_APPLIED', RESET_VERSION);
-          console.log('✓ Local storage & IndexedDB lama berhasil dibersihkan total.');
-        } catch (e) { }
-      }
-    })();
-  </script>
+  <!-- Dashboard layout updates must never clear existing school data.
+       Data reset remains an explicit user action in the application. -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>SIAP BOS — Pengelolaan BOSP &amp; ARKAS</title>
@@ -94,6 +80,11 @@
           <div id="npsn-school-kec" class="gov-preview-kec"></div>
         </div>
 
+        <div id="npsn-lookup-load" class="gov-lookup-load" style="display:none;">
+          <span class="gov-lookup-spin"></span>
+          <span>Memeriksa NPSN di database sekolah…</span>
+        </div>
+
         <div class="gov-input-head" style="margin-top:14px;">
           <label for="npsn-pin-input" class="gov-input-label">
             <svg class="gov-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
@@ -153,8 +144,22 @@
     </div>
   </div>
 
+  <!-- ============================================================
+     LOGIN LOADING — membaca data NPSN (blue/white, elegan & modern)
+     ============================================================ -->
+  <div id="npsn-loading-overlay" class="npsn-loading-overlay" aria-hidden="true">
+    <div class="npsn-loading-card">
+      <div class="npsn-spinner"></div>
+      <div class="npsn-loading-title">MEMBACA DATA NPSN</div>
+      <div class="npsn-loading-text" id="npsnLoadingText">Memvalidasi NPSN…</div>
+      <div class="npsn-loading-sub" id="npsnLoadingSub">Sedang memeriksa format dan keberadaan sekolah Anda.</div>
+      <div class="npsn-loading-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="workspace-shell">
+      <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
       <aside class="app-sidebar" id="appSidebar">
         <div class="sidebar-collapsed-title" aria-hidden="true">
           <span>SIAP BOS</span>
@@ -236,6 +241,13 @@
       </aside>
       <main class="workspace-main">
         <div class="workspace-topbar">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Buka menu navigasi" aria-expanded="false" title="Buka menu">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="4" y1="7" x2="20" y2="7"/>
+              <line x1="4" y1="12" x2="20" y2="12"/>
+              <line x1="4" y1="17" x2="20" y2="17"/>
+            </svg>
+          </button>
           <div class="topbar-context" style="display:flex; align-items:center; gap:8px;">
             <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS" style="width:22px; height:22px; object-fit:contain;">
             <span class="topbar-dot"></span>
@@ -268,9 +280,9 @@
           </div>
         </div>
         <div id="tabDashboard" class="tab-panel active dashboard-group" role="tabpanel">
-          <section class="card hero">
+          <section class="card hero dash-brand-hero">
             <div class="top">
-              <div style="display:flex; gap:16px; align-items:flex-start;">
+              <div class="dash-brand-copy">
                 <img src="assets/SIAP_BOS_LOGO.png" alt="SIAP BOS"
                   style="width:64px; height:64px; object-fit:contain; filter:drop-shadow(0 4px 12px rgba(37,99,235,0.3)); flex-shrink:0; margin-top:4px;">
                 <div>
@@ -297,63 +309,36 @@
               <span class="step"><i class="step-num">5</i> Cetak Fisik A4 / PDF</span>
             </div>
           </section>
-          <section class="dx-head">
-            <div>
-              <div class="dx-eyebrow"><span class="dx-live"></span>RINGKASAN PEKERJAAN TERSIMPAN</div>
-              <h2>Dashboard</h2>
-              <p>Rekap otomatis dari seluruh SPMU yang sudah disimpan di Tab SURAT PERINTAH.</p>
+          <header class="dash-simple-head">
+            <div><h2>Dashboard</h2><p>Ringkasan belanja, pajak, dan SPMU sekolah.</p><span class="dx-updated" id="dashUpdated" aria-live="polite"></span></div>
+            <div class="dash-head-actions">
+              <button id="dashGoBku" class="command-btn dash-primary" type="button">Baca BKU</button>
+              <button id="dashGoSurat" class="command-btn" type="button">Surat Perintah</button>
+              <button id="dashGoPajak" class="command-btn" type="button">Hitung Pajak</button>
+              <button id="dashboardRefreshBtn" class="dx-refresh" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4" /><path d="M21 3v6h-6" /></svg><span>Refresh</span></button>
             </div>
-            <div class="dx-head-actions"><span class="dx-updated" id="dashUpdated"></span><button
-                id="dashboardRefreshBtn" class="dx-refresh" type="button"><svg viewBox="0 0 24 24" width="20"
-                  height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" aria-hidden="true">
-                  <path d="M21 12a9 9 0 1 1-2.6-6.4" />
-                  <path d="M21 3v6h-6" />
-                </svg><span>Refresh</span></button></div>
-          </section>
-          <section class="dashboard-commandbar">
-            <div class="dashboard-quick-actions">
-              <button type="button" class="command-btn" id="dashGoBku">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"
-                  style="vertical-align:middle;margin-right:4px;">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span>Baca BKU</span>
-              </button>
-              <button type="button" class="command-btn" id="dashGoSurat">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
-                  style="vertical-align:middle;margin-right:4px;">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                <span>Surat Perintah</span>
-              </button>
-              <button type="button" class="command-btn" id="dashGoPajak">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
-                  style="vertical-align:middle;margin-right:4px;">
-                  <line x1="19" y1="5" x2="5" y2="19"></line>
-                  <circle cx="6.5" cy="6.5" r="2.5"></circle>
-                  <circle cx="17.5" cy="17.5" r="2.5"></circle>
-                </svg>
-                <span>Hitung Pajak</span>
-              </button>
-              <span class="command-label"
-                style="margin-left:10px; border-left:1px solid #cbd5e1; padding-left:10px;">Filter Bulan:</span>
-              <div id="dashProjectChips" class="dash-project-chips"
-                style="display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap;"></div>
-            </div>
-            <div class="dashboard-filter">
-              <label for="dashCategoryFilter">Filter kategori</label>
-              <select id="dashCategoryFilter" aria-label="Filter kategori dashboard">
-                <option value="all">Semua kategori</option>
-                <option value="Belanja Modal : Peralatan dan Mesin">Modal — Peralatan &amp; Mesin</option>
-                <option value="Belanja Modal : Aset Tetap Lainya">Modal — Aset Tetap Lainnya</option>
-                <option value="Belanja Operasional : Barang dan Jasa">Operasional — Barang &amp; Jasa</option>
-                <option value="Belanja Operasional : Pegawai">Operasional — Pegawai</option>
-              </select>
-            </div>
-          </section>
+          </header>
+          <div class="dash-filterbar">
+            <label for="dashYearFilter">Tahun <select id="dashYearFilter" class="dash-select" aria-label="Filter tahun dashboard"><option value="all">Semua tahun</option></select></label>
+            <label for="dashPeriodFilter">Periode <select id="dashPeriodFilter" class="dash-select" aria-label="Filter periode dashboard">
+                  <option value="all">Semua periode</option>
+                  <optgroup label="Per Bulan">
+                    <option value="m1">Januari</option><option value="m2">Februari</option><option value="m3">Maret</option>
+                    <option value="m4">April</option><option value="m5">Mei</option><option value="m6">Juni</option>
+                    <option value="m7">Juli</option><option value="m8">Agustus</option><option value="m9">September</option>
+                    <option value="m10">Oktober</option><option value="m11">November</option><option value="m12">Desember</option>
+                  </optgroup>
+                  <optgroup label="Per Triwulan (3 bulan)">
+                    <option value="tw1">Triwulan I • Jan–Mar</option><option value="tw2">Triwulan II • Apr–Jun</option>
+                    <option value="tw3">Triwulan III • Jul–Sep</option><option value="tw4">Triwulan IV • Okt–Des</option>
+                  </optgroup>
+                  <optgroup label="Per Tahap (6 bulan)">
+                    <option value="th1">Tahap 1 • Jan–Jun</option><option value="th2">Tahap 2 • Jul–Des</option>
+                  </optgroup>
+                </select></label>
+            <button id="dashResetFilters" type="button" class="command-btn">Reset filter</button>
+            <span class="dash-filter-note">Ringkasan semua kategori; kategori dan pencarian hanya menyaring detail SPMU.</span>
+          </div>
           <section class="dx-kpis">
             <article class="dx-kpi k-count">
               <div class="dx-kpi-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
@@ -388,29 +373,36 @@
                 id="dashTaxDetail">Akumulasi dari 0 BKU tersimpan • SIPLah Rp 0 • Non SIPLah Rp 0</small>
             </article>
           </section>
-          <section class="dx-row">
+          <div class="dash-context"><span>Total belanja <b id="dashSpendTotal">Rp 0</b></span><span id="dashCoverage">0 BKU tersimpan</span></div>
+          <div class="dash-view-tabs" role="tablist" aria-label="Bagian dashboard">
+            <button type="button" id="dashTabOverview" role="tab" aria-controls="dashPanelOverview" aria-selected="true" data-dash-view="overview">Ringkasan</button>
+            <button type="button" id="dashTabRecap" role="tab" aria-controls="dashPanelRecap" aria-selected="false" tabindex="-1" data-dash-view="recap">Rekap Periode</button>
+            <button type="button" id="dashTabDetails" role="tab" aria-controls="dashPanelDetails" aria-selected="false" tabindex="-1" data-dash-view="details">Detail SPMU <span id="dashDetailCount">0</span></button>
+          </div>
+          <section id="dashPanelOverview" role="tabpanel" aria-labelledby="dashTabOverview" data-dash-panel="overview">
+            <section class="dx-row">
             <div class="card dash-composition-card dx-donut-card">
               <div class="section-title">Komposisi Belanja</div>
-              <div class="section-sub">Porsi tiap kategori terhadap total pengeluaran SPMU tersimpan.</div>
+              <div class="section-sub" id="dashCompSub">Porsi tiap kategori terhadap total pengeluaran SPMU tersimpan.</div>
               <div id="dashComposition"></div>
             </div>
             <div class="card dx-tax-recap-card">
               <div class="section-title">Rekap Pajak</div>
-              <div class="section-sub">Akumulasi pajak dari seluruh BKU tersimpan.</div>
+              <div class="section-sub" id="dashTaxSub">Akumulasi pajak dari seluruh BKU tersimpan.</div>
               <div class="dx-tax-recap">
-                <div class="dx-tax-box dx-tax-siplah"><span>Jumlah Pajak Siplah</span><b id="dashTaxSiplah">Rp
-                    0</b><small>Transaksi SIPLah</small></div>
-                <div class="dx-tax-box dx-tax-nonsiplah"><span>Jumlah Pajak Non-Siplah</span><b id="dashTaxNonSiplah">Rp
-                    0</b><small>Transaksi Non-SIPLah</small></div>
+                <div class="dx-tax-box dx-tax-siplah"><span>Jumlah Pajak Siplah</span><b id="dashTaxSiplah">Rp 0</b><small id="dashTaxSiplahMeta">Transaksi SIPLah</small></div>
+                <div class="dx-tax-box dx-tax-nonsiplah"><span>Jumlah Pajak Non-Siplah</span><b id="dashTaxNonSiplah">Rp 0</b><small id="dashTaxNonSiplahMeta">Transaksi Non-SIPLah</small></div>
               </div>
+              <details class="dash-fold"><summary>Rincian jenis pajak &amp; tren bulanan</summary><div id="dashTaxExtra"></div></details>
             </div>
           </section>
-          <section class="card dashboard-view-controls">
+            <details class="dash-fold dash-category-fold"><summary>Grafik &amp; tabel kategori belanja</summary>
+            <section class="card dashboard-view-controls">
             <div>
               <div class="section-title">Kategori Belanja</div>
               <div class="section-sub">Pilih tampilan grafik dinamis atau rekap angka per kategori.</div>
             </div>
-            <div class="view-switch" role="group" aria-label="Tampilan kategori belanja"><button type="button"
+            <div class="view-switch category-switch" role="group" aria-label="Tampilan kategori belanja"><button type="button"
                 class="view-switch-btn active" data-view="chart">▥ Grafik</button><button type="button"
                 class="view-switch-btn" data-view="data">▤ Data</button></div>
           </section>
@@ -448,16 +440,79 @@
               </table>
             </div>
           </section>
-          <section class="card dashboard-detail">
+            </details>
+            <details class="dash-fold dash-help"><summary>Panduan singkat alur kerja</summary><p>Baca BKU → ekstrak dan validasi → verifikasi data → simpan Surat Perintah / SPMU → cetak SPMU &amp; Kwitansi. Periksa pajak melalui tombol Hitung Pajak. Dashboard merangkum data tersimpan.</p></details>
+          </section>
+          <section id="dashPanelRecap" role="tabpanel" aria-labelledby="dashTabRecap" data-dash-panel="recap" hidden>
+            <section class="card dash-recap dash-recap-merged">
             <div class="toolbar">
               <div>
-                <div class="section-title">Rekap Tersimpan</div>
+                <div class="section-title">Rekap Periodik</div>
+                <div class="section-sub">Rekap seluruh tahun terpilih, tidak dibatasi filter periode. Klik baris untuk memilih periode; total belanja dan pajak tampil terpisah.</div>
+              </div>
+              <div class="view-switch recap-switch" role="group" aria-label="Tampilan rekap periodik">
+                <button type="button" class="view-switch-btn active" data-recap="tahap">▤ per Tahap</button>
+                <button type="button" class="view-switch-btn" data-recap="triwulan">▦ per Triwulan</button>
+              </div>
+            </div>
+            <div class="recap-panel" data-recap-panel="tahap">
+              <div class="section-sub" style="margin:10px 0 8px;">1 tahap = 6 bulan. <b id="dashRecapTahapYear"></b></div>
+              <div class="table-wrap">
+                <table class="data-table dash-recap-table">
+                  <thead>
+                    <tr>
+                      <th>Periode</th>
+                      <th>Bulan BKU</th>
+                      <th class="num">SPMU</th>
+                      <th class="num">Belanja Modal</th>
+                      <th class="num">Belanja Operasional</th>
+                      <th class="num">Total</th>
+                      <th class="num">Pajak</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashRecapTahapBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="recap-panel" data-recap-panel="triwulan" hidden>
+              <div class="section-sub" style="margin:10px 0 8px;">1 triwulan = 3 bulan. <b id="dashRecapTwYear"></b></div>
+              <div class="table-wrap">
+                <table class="data-table dash-recap-table">
+                  <thead>
+                    <tr>
+                      <th>Periode</th>
+                      <th>Bulan BKU</th>
+                      <th class="num">SPMU</th>
+                      <th class="num">Belanja Modal</th>
+                      <th class="num">Belanja Operasional</th>
+                      <th class="num">Total</th>
+                      <th class="num">Pajak</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashRecapTwBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+          </section>
+          <section id="dashPanelDetails" role="tabpanel" aria-labelledby="dashTabDetails" data-dash-panel="details" hidden>
+            <section class="card dashboard-detail">
+            <div class="toolbar">
+              <div>
+                <div class="section-title">Detail SPMU</div>
                 <div class="section-sub">Pantau pekerjaan, tujuan pembayaran, kategori, waktu penyimpanan, dan nilai
                   setiap SPMU. Gunakan pencarian untuk menemukan data tersimpan.</div>
               </div><input id="dashSearch" class="search" type="search"
                 placeholder="Cari pekerjaan / pembayaran / kategori / no. bukti…" aria-label="Cari rekap">
             </div>
-            <div class="table-wrap">
+            <div class="dash-detail-filter"><label for="dashCategoryFilter">Kategori SPMU</label><select id="dashCategoryFilter" aria-label="Filter kategori dashboard">
+                  <option value="all">Semua kategori</option>
+                  <option value="Belanja Modal : Peralatan dan Mesin">Modal — Peralatan &amp; Mesin</option>
+                  <option value="Belanja Modal : Aset Tetap Lainya">Modal — Aset Tetap Lainnya</option>
+                  <option value="Belanja Operasional : Barang dan Jasa">Operasional — Barang &amp; Jasa</option>
+                  <option value="Belanja Operasional : Pegawai">Operasional — Pegawai</option>
+                </select><span id="dashTableStatus" aria-live="polite"></span></div>
+            <div class="table-wrap" tabindex="0" aria-label="Tabel detail SPMU">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -476,6 +531,11 @@
                 </tbody>
               </table>
             </div>
+            <div class="dash-pagination">
+              <label for="dashPageSize">Baris per halaman <select id="dashPageSize"><option value="10">10</option><option value="25">25</option><option value="50">50</option></select></label>
+              <div><button id="dashPagePrev" type="button" disabled aria-label="Halaman sebelumnya">Sebelumnya</button><span id="dashPageInfo" aria-live="polite">Halaman 1 / 1</span><button id="dashPageNext" type="button" disabled aria-label="Halaman berikutnya">Berikutnya</button></div>
+            </div>
+          </section>
           </section>
         </div>
         <div id="profileModal" class="profile-modal" aria-hidden="true">
@@ -585,7 +645,7 @@
           </section>
         </div>
         <div id="tabBku" class="tab-panel bku-group" role="tabpanel">
-          <section class="card">
+          <section class="card" id="bkuImportCard">
             <div class="upload-head">
               <div class="upload-icon">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
@@ -598,6 +658,10 @@
                 <div class="section-title">Impor Dokumen BKU</div>
                 <div class="section-sub">Pilih berkas sumber untuk mulai mengekstrak dan memvalidasi transaksi.</div>
               </div>
+            </div>
+            <div class="bkx-top">
+              <ol id="bkuSteps" class="bkx-steps" aria-label="Langkah impor BKU"></ol>
+              <label class="bkx-auto"><input type="checkbox" id="bkuAutoRead"> Baca otomatis setelah berkas dipilih</label>
             </div>
             <div class="controls">
               <input id="fileInput" type="file"
@@ -654,8 +718,10 @@
                 <span>RESET</span>
               </button>
             </div>
+            <div id="bkuFileChip" class="bkx-file"></div>
             <div class="project-save-row"><span id="projectSaveName">Belum ada pekerjaan tersimpan.</span><span
                 id="projectSaveStatus" class="project-save-status">Penyimpanan lokal siap digunakan.</span></div>
+            <div id="bkuSummary" class="bkx-sum" aria-live="polite"></div>
             <div class="hint" style="margin-top:12px">Format didukung: PDF, XLSX, dan XLS. BKU dari semua sekolah dapat
               diproses berdasarkan NPSN. Baris dengan Pengeluaran &gt; 0 akan diproses, kecuali Tarik Tunai yang
               merupakan pemindahan dana internal.</div>
@@ -834,6 +900,7 @@
             <!-- ================= KOLOM KANAN: PRATINJAU ================= -->
             <main class="sv-right">
               <section class="sv-card sv-viewer-card">
+                <div id="suratMonthNav" class="sv-monthnav" aria-label="Navigasi bulan pekerjaan tersimpan"></div>
                 <div class="sv-head">
                   <h3 id="svDocTitle" class="sv-card-title" style="margin:0">Surat Perintah hasil pratinjau</h3>
                   <div class="sv-pills surat-actions">
@@ -958,17 +1025,10 @@
       <div class="project-modal-head">
         <div>
           <div id="projectModalTitle" class="project-modal-title">Pekerjaan Tersimpan</div>
-          <div id="projectModalSubtitle" class="project-modal-subtitle">Data disimpan hanya pada browser/perangkat ini.
+          <div id="projectModalSubtitle" class="project-modal-subtitle">Pekerjaan diberi nama otomatis sesuai bulan BKU.
           </div>
         </div><button id="projectModalClose" class="project-modal-close" type="button" aria-label="Tutup"
           style="position: absolute; right: 24px; top: 24px; cursor: pointer; z-index: 10;">×</button>
-      </div>
-      <div id="projectSaveBox" class="project-save-box" style="display:none"><label for="projectNameInput">Nama
-          pekerjaan</label>
-        <div class="project-save-input-row"><input id="projectNameInput" class="project-name-input" type="text"
-            maxlength="120" placeholder="Contoh: BKU SD Negeri Krian September 2026"><button id="projectConfirmSaveBtn"
-            class="btn primary" type="button">Simpan</button></div>
-        <div class="small">File BKU dan seluruh hasil kerja akan ikut disimpan.</div>
       </div>
       <div id="projectList" class="project-list">
         <div class="project-empty">Memuat pekerjaan tersimpan…</div>
@@ -1040,9 +1100,8 @@
     <div class="mr-loading-card">
       <div id="mrLoadingAvatar" class="mr-loading-avatar" aria-live="polite">
         <div class="mr-spinner"></div>
-        <div class="mr-face">👨‍💼</div>
       </div>
-      <div class="mr-loading-title">LOADING</div>
+      <div class="mr-loading-title">MEMBACA DOKUMEN</div>
       <div id="mrLoadingText" class="mr-loading-text">Menyiapkan pembacaan BKU…</div>
       <div class="mr-loading-bar"><span id="mrLoadingProgress"></span></div>
       <div id="mrLoadingDetail" class="mr-loading-detail">Mohon tunggu, data sedang dibaca dengan teliti.</div>
@@ -1065,6 +1124,7 @@
   <script src="js/project-store.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/bku-import-panel.js"></script>
 
   <script src="js/bku-action-manager.js"></script>
 
@@ -1131,10 +1191,16 @@
         if (errEl) errEl.style.display = 'none';
         if (input) input.classList.remove('is-invalid');
         const btn = document.getElementById('npsn-login-btn');
-        if (btn) {
-          btn.disabled = true;
-          btn.innerHTML = '<span class="gov-spinner"></span><span>Memeriksa Status Aktivasi Akses...</span>';
+        const npsnOv = document.getElementById('npsn-loading-overlay');
+        function setNpsnLoading(txt, sub) {
+          const t = document.getElementById('npsnLoadingText');
+          const s = document.getElementById('npsnLoadingSub');
+          if (t) t.textContent = txt;
+          if (s && sub != null) s.textContent = sub;
         }
+        if (btn) btn.disabled = true;
+        if (npsnOv) { npsnOv.classList.add('show'); npsnOv.setAttribute('aria-hidden', 'false'); }
+        setNpsnLoading('Memvalidasi NPSN…', 'Sedang memeriksa format dan keberadaan sekolah Anda.');
 
         // Cari nama sekolah & kecamatan dari master NPSN
         let schoolName = '';
@@ -1147,6 +1213,8 @@
           schoolName = found?.name || found?.sekolah || found?.school || '';
         }
 
+        setNpsnLoading('Membaca data NPSN…', 'Memverifikasi akses sekolah ke ruang kerja BKU.');
+
         // LOGIN NPSN KE SUPABASE CLOUD — hanya NPSN yang aktif yang mendapat session token.
         try {
           const loginData = await window.SIAP_BOS_SUPABASE.schoolLogin(npsn, pin);
@@ -1155,8 +1223,10 @@
           sessionStorage.setItem(SCHOOL_KEY, schoolName);
           sessionStorage.setItem('SIAP_BOS_SCHOOL_KECAMATAN', loginData.kecamatan || '');
           if (pinInput) pinInput.value = '';
+          if (npsnOv) { npsnOv.classList.remove('show'); npsnOv.setAttribute('aria-hidden', 'true'); }
           unlockApp(loginData.npsn || npsn, schoolName);
         } catch (netErr) {
+          if (npsnOv) { npsnOv.classList.remove('show'); npsnOv.setAttribute('aria-hidden', 'true'); }
           if (btn) {
             btn.disabled = false;
             btn.innerHTML = '<span class="btn-text">Masuk ke Ruang Kerja BKU</span><svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
@@ -1221,6 +1291,9 @@
             if (npsn.length >= 8 && allowed && allowed.has(npsn)) {
               clearTimeout(lookupTimer);
               lookupTimer = setTimeout(async () => {
+                const loadEl = document.getElementById('npsn-lookup-load');
+                if (loadEl) loadEl.style.display = 'flex';
+                if (preview) preview.style.display = 'none';
                 try {
                   const info = await window.SPMU?.lookupNpsnInfo?.(npsn);
                   let isActive = false;
@@ -1237,12 +1310,15 @@
                     if (preview) preview.style.display = 'block';
                   }
                 } catch (_) { }
+                if (loadEl) loadEl.style.display = 'none';
               }, 400);
             } else if (npsn.length >= 8 && allowed && allowed.size > 0 && !allowed.has(npsn)) {
               inp.style.borderColor = '#ef4444'; // merah
               if (preview) preview.style.display = 'none';
+              const l2 = document.getElementById('npsn-lookup-load'); if (l2) l2.style.display = 'none';
             } else {
               inp.style.borderColor = ''; // reset
+              const l2 = document.getElementById('npsn-lookup-load'); if (l2) l2.style.display = 'none';
             }
           });
         }
@@ -1260,6 +1336,22 @@
         const inp = document.getElementById('npsn-input');
         if (inp) { inp.value = ''; inp.focus(); }
       };
+    })();
+  </script>
+  <script>
+    (function(){
+      var shell=document.querySelector(".workspace-shell");
+      var btn=document.getElementById("mobileMenuBtn");
+      var bd=document.getElementById("sidebarBackdrop");
+      if(!shell||!btn) return;
+      function open(){shell.classList.add("sidebar-open");btn.setAttribute("aria-expanded","true")}
+      function close(){shell.classList.remove("sidebar-open");btn.setAttribute("aria-expanded","false")}
+      function toggle(){shell.classList.contains("sidebar-open")?close():open()}
+      btn.addEventListener("click",toggle);
+      if(bd) bd.addEventListener("click",close);
+      shell.querySelectorAll(".side-btn").forEach(function(item){
+        item.addEventListener("click",function(){if(window.matchMedia("(max-width:760px)").matches) close()});
+      });
     })();
   </script>
 </body>

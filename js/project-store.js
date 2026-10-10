@@ -48,52 +48,76 @@ function detectMonthFromText(text){
   return 0;
 }
 
-function detectMonthFromProject(p){
-  if(!p) return { month: 999, monthName: 'Lainnya' };
-  const s = p.state || {};
-  const ident = s.identity || {};
-
-  const identFields = [ident.bulan, ident.periode, ident.periodeBulan, ident.month, ident.namaBulan];
-  for(const f of identFields){
-    const m = detectMonthFromText(f);
-    if(m > 0) return { month: m, monthName: getMonthName(m) };
-  }
-
-  const fileMonth = detectMonthFromText(p.file?.name);
-  if(fileMonth > 0) return { month: fileMonth, monthName: getMonthName(fileMonth) };
-
-  const nameMonth = detectMonthFromText(p.name);
-  if(nameMonth > 0) return { month: nameMonth, monthName: getMonthName(nameMonth) };
-
-  const rows = Array.isArray(s.rows) && s.rows.length ? s.rows : (Array.isArray(s.rawRows) ? s.rawRows : []);
-  if(rows && rows.length){
-    for(const r of rows){
-      const tgl = String(r.tanggal || r.tgl || r.date || '');
-      const tm = detectMonthFromText(tgl);
-      if(tm > 0) return { month: tm, monthName: getMonthName(tm) };
-
-      const m1 = tgl.match(/\b\d{4}[-/](\d{1,2})[-/]\d{1,2}\b/);
-      if(m1){
-        const mon = parseInt(m1[1], 10);
-        if(mon >= 1 && mon <= 12) return { month: mon, monthName: getMonthName(mon) };
-      }
-      const m2 = tgl.match(/\b\d{1,2}[-/](\d{1,2})[-/]\d{2,4}\b/);
-      if(m2){
-        const mon = parseInt(m2[1], 10);
-        if(mon >= 1 && mon <= 12) return { month: mon, monthName: getMonthName(mon) };
-      }
-    }
-  }
-
-  return { month: 999, monthName: 'Lainnya' };
+function validMonth(m){m=Number(m);return Number.isInteger(m)&&m>=1&&m<=12?m:0;}
+function normYear(y){y=Number(y);if(!y)return 0;if(y<100)y+=2000;return y>=2000&&y<=2100?y:0;}
+// Baca bulan & tahun dari satu teks tanggal (DD-MM-YYYY, YYYY-MM-DD, atau nama bulan).
+function parseMonthYear(t){
+  const s=String(t??'');
+  if(!s)return null;
+  let m=s.match(/\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b/);
+  if(m&&validMonth(m[2]))return {month:+m[2],year:normYear(m[1])};
+  m=s.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})\b/);
+  if(m&&validMonth(m[2]))return {month:+m[2],year:normYear(m[3])};
+  m=s.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{2})\b/);
+  if(m&&validMonth(m[2]))return {month:+m[2],year:normYear(m[3])};
+  const nm=detectMonthFromText(s);
+  if(nm){const y=s.match(/\b(20\d{2})\b/);return {month:nm,year:y?Number(y[1]):0};}
+  return null;
 }
-
+// Bulan BKU = bulan yang paling banyak muncul pada tanggal transaksi.
+function periodFromRows(rows){
+  if(!Array.isArray(rows)||!rows.length)return null;
+  const count=new Map();
+  for(const r of rows){
+    if(!r)continue;
+    const my=parseMonthYear(r.tanggal||r.tgl||r.date);
+    if(!my)continue;
+    const key=my.year*100+my.month;
+    count.set(key,(count.get(key)||0)+1);
+  }
+  if(!count.size)return null;
+  let best=null;
+  for(const [key,n] of count){
+    if(!best||n>best.n||(n===best.n&&key<best.key))best={key,n};
+  }
+  return {month:best.key%100,year:Math.floor(best.key/100)};
+}
+function makePeriod(month,year){
+  if(!month)return {month:999,year:0,monthName:'Lainnya',label:'Lainnya',key:999};
+  const monthName=getMonthName(month);
+  return {month,year:year||0,monthName,label:year?`${monthName} ${year}`:monthName,key:(year||0)*100+month};
+}
+function detectMonthFromProject(p){
+  if(!p)return makePeriod(0,0);
+  const s=p.state||{};
+  const ident=s.identity||{};
+  // 1) Sumber utama: tanggal transaksi pada BKU.
+  const fromRows=periodFromRows(Array.isArray(s.rows)&&s.rows.length?s.rows:s.rawRows);
+  if(fromRows)return makePeriod(fromRows.month,fromRows.year);
+  // 2) Cadangan: identitas/nama file/nama pekerjaan.
+  const texts=[ident.periode,ident.bulan,ident.periodeBulan,ident.month,ident.namaBulan,p.monthName,p.file?.name,p.name];
+  for(const t of texts){
+    const my=parseMonthYear(t);
+    if(my&&my.month)return makePeriod(my.month,my.year);
+  }
+  return makePeriod(0,0);
+}
+// Nama pekerjaan otomatis = bulan (+ tahun) yang terbaca dari BKU.
+function projectDisplayName(p){
+  const info=detectMonthFromProject(p);
+  return info.month!==999?info.label:String(p?.name||'Pekerjaan BKU');
+}
+function autoProjectName(){
+  const st=ns.state||{};
+  const info=detectMonthFromProject({state:{rows:st.rows,rawRows:st.rawRows,identity:st.identity},file:st.file,name:''});
+  return info.month!==999?info.label:'';
+}
 function sortProjectsByMonth(arr){
-  return [...(arr || [])].sort((a, b) => {
-    const mA = detectMonthFromProject(a);
-    const mB = detectMonthFromProject(b);
-    if(mA.month !== mB.month) return mA.month - mB.month;
-    return Number(a.createdAt || 0) - Number(b.createdAt || 0);
+  return [...(arr||[])].sort((a,b)=>{
+    const mA=detectMonthFromProject(a),mB=detectMonthFromProject(b);
+    if(mA.year!==mB.year)return mA.year-mB.year;
+    if(mA.month!==mB.month)return mA.month-mB.month;
+    return Number(a.createdAt||0)-Number(b.createdAt||0);
   });
 }
 
@@ -282,7 +306,12 @@ function cloneState(){
     activeTab:activeTabName(),
     category:String(ns.state?.category||'')
   };
-  return JSON.parse(JSON.stringify(state));
+  const cloned=JSON.parse(JSON.stringify(state));
+  const info=detectMonthFromProject({state:cloned,file:ns.state?.file,name:''});
+  if(info.month!==999){
+    cloned.identity={...(cloned.identity||{}),bulan:info.monthName,periode:info.label};
+  }
+  return cloned;
 }
 
 async function fileToDataUrl(file){
@@ -312,7 +341,7 @@ async function buildPayload(name,id){
   if(id){const old=await getProject(id);createdAt=old?.createdAt||now}
   return {
     id:id||('p_'+now+'_'+Math.random().toString(36).slice(2,10)),
-    name:String(name||baseName()).trim()||'Pekerjaan BKU',
+    name:String(autoProjectName()||name||baseName()).trim()||'Pekerjaan BKU',
     createdAt,updatedAt:now,version:3,
     file:{name:file.name||'BKU',type:file.type||'',size:file.size||blob.size,lastModified:file.lastModified||now,blob},
     state:cloneState()
@@ -370,6 +399,7 @@ function markSaved(project,backend){
   setText('projectSaveName',project?.name?`Pekerjaan aktif: ${project.name}`:'Belum ada pekerjaan tersimpan.');
   setSaveStatus(`✓ TERSIMPAN • ${backend||'Database'} • ${new Date(project.updatedAt||Date.now()).toLocaleTimeString('id-ID')}`,'ok');
   if(ns.state)ns.state._projectDirty=false;
+  renderSuratMonthNav();
 }
 function markDirty(){
   if(!activeProjectId)return;
@@ -385,11 +415,34 @@ function scheduleAutoSave(){
   },1000);
 }
 
-async function saveCurrentFromUi(name){
-  const p=await putProject(name||baseName(),activeProjectId);
-  closeProjectDialog();
+// Simpan otomatis: nama = bulan BKU. Jika bulan yang sama sudah tersimpan, tawarkan untuk menimpanya.
+async function saveCurrentAuto(){
+  if(!ns.state?.file){window.alert('Pilih/upload file BKU terlebih dahulu.');return null;}
+  let id=activeProjectId;
+  if(!id){
+    const label=autoProjectName();
+    if(label){
+      const all=await getAllProjects();
+      const dup=all.find(p=>detectMonthFromProject(p).label===label);
+      if(dup){
+        const ok=window.confirm(`Pekerjaan bulan ${label} sudah tersimpan.\n\nTimpa dengan BKU yang sedang dibuka? Data SPMU yang tersimpan pada bulan tersebut akan diganti.`);
+        if(!ok)return null;
+        id=dup.id;
+      }
+    }
+  }
+  const p=await putProject(null,id);
   await renderProjectList();
   return p;
+}
+async function saveCurrentFromUi(){return saveCurrentAuto();}
+
+// Simpan dulu bila ada perubahan sebelum pindah ke pekerjaan lain.
+async function flushIfDirty(){
+  if(activeProjectId&&ns.state?._projectDirty){
+    clearTimeout(autoSaveTimer);
+    await putProject(null,activeProjectId);
+  }
 }
 
 async function renderProjectList(){
@@ -397,67 +450,34 @@ async function renderProjectList(){
   try{
     const arr=await getAllProjects();
     if(!arr.length){
-      box.innerHTML='<div class="project-empty">Belum ada pekerjaan yang disimpan.<br><small>Setelah klik SIMPAN, pekerjaan akan muncul di sini.</small></div>';
+      box.innerHTML='<div class="project-empty">Belum ada pekerjaan yang disimpan.<br><small>Setelah klik SIMPAN, pekerjaan akan muncul di sini dengan nama sesuai bulan BKU.</small></div>';
       return;
     }
-
-    const sorted = sortProjectsByMonth(arr);
-
-    const headerHtml = `
-      <div class="open-all-projects-box" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding:12px 14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px;">
-        <div>
-          <b style="color:#1d4ed8; font-size:14px;">📂 Buka Semua Pekerjaan (${sorted.length} File)</b>
-          <div style="font-size:12px; color:#475569; margin-top:3px;">Otomatis diurutkan berurutan per <b>Bulan BKU</b>.</div>
-        </div>
-        <button type="button" class="btn btn-primary" id="openAllProjectsBtn" style="background:#2563eb; color:#fff; font-weight:700; padding:8px 16px; border:none; border-radius:6px; cursor:pointer;">
-          Buka Semua
-        </button>
-      </div>
-    `;
-
-    const itemsHtml = sorted.map(p=>{
+    const sorted=sortProjectsByMonth(arr);
+    box.innerHTML=sorted.map(p=>{
       const count=p.state?.rows?.length||0;
       const file=safeEsc(p.file?.name||'BKU');
-      const name=safeEsc(p.name||'Tanpa nama');
+      const name=safeEsc(projectDisplayName(p));
       const when=new Date(p.updatedAt||0).toLocaleString('id-ID');
       const backend=p._fallback?'cadangan':'Supabase Cloud ☁️';
       const active=p.id===activeProjectId?' active':'';
-      const mInfo=detectMonthFromProject(p);
-      const monthBadge=`<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:11px; font-weight:600; padding:2px 7px; border-radius:4px; margin-left:6px;">📅 ${safeEsc(mInfo.monthName)}</span>`;
       const emptyBadge=count===0?`<span style="display:inline-block; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; margin-left:6px;">⚪ BKU Kosong</span>`:'';
-      const countDesc=count===0?'0 transaksi (BKU Kosong) &bull; Sah Masuk Pekerjaan':`${count} transaksi`;
-      return `<div class="project-item${active}"><div class="project-main"><b>${name}</b>${monthBadge}${emptyBadge}<span>${file} • ${countDesc} • ${when} • ${backend}</span></div><div class="project-actions"><button type="button" class="btn project-open-btn" data-action="open" data-id="${safeEsc(p.id)}">Buka</button><button type="button" class="btn project-download-btn" data-action="download" data-id="${safeEsc(p.id)}">Cadangan</button><button type="button" class="btn project-delete-btn" data-action="delete" data-id="${safeEsc(p.id)}">Hapus</button></div></div>`;
+      const countDesc=count===0?'0 transaksi (BKU Kosong)':`${count} transaksi`;
+      return `<div class="project-item${active}"><div class="project-main"><b>📅 ${name}</b>${emptyBadge}<span>${file} • ${countDesc} • ${when} • ${backend}</span></div><div class="project-actions"><button type="button" class="btn project-open-btn" data-action="open" data-id="${safeEsc(p.id)}">Buka</button><button type="button" class="btn project-download-btn" data-action="download" data-id="${safeEsc(p.id)}">Cadangan</button><button type="button" class="btn project-delete-btn" data-action="delete" data-id="${safeEsc(p.id)}">Hapus</button></div></div>`;
     }).join('');
-
-    box.innerHTML = headerHtml + itemsHtml;
-
-    const openAllBtn = q('openAllProjectsBtn');
-    if(openAllBtn){
-      openAllBtn.addEventListener('click', async()=>{
-        try{
-          openAllBtn.disabled = true;
-          openAllBtn.textContent = 'Memproses...';
-          await loadAllProjects();
-        }catch(err){
-          window.alert(normalizeError(err));
-        }finally{
-          openAllBtn.disabled = false;
-          openAllBtn.textContent = 'Buka Semua';
-        }
-      });
-    }
 
     box.querySelectorAll('button[data-action]').forEach(btn=>btn.addEventListener('click',async e=>{
       const action=e.currentTarget.dataset.action,id=e.currentTarget.dataset.id;
       try{
-        if(action==='open'){await loadProject(id);closeProjectDialog();}
+        if(action==='open'){await flushIfDirty();await loadProject(id);closeProjectDialog();}
         else if(action==='download')await downloadProject(id);
         else if(action==='delete'){
           const p=await getProject(id);
-          if(!p || window.confirm(`Hapus pekerjaan "${p.name||id}" secara permanen?`)){
+          if(!p || window.confirm(`Hapus pekerjaan "${p?projectDisplayName(p):id}" secara permanen?`)){
             await deleteProject(id);
             if(activeProjectId===id)detachActiveProject();
             await renderProjectList();
+            renderSuratMonthNav();
           }
         }
       }catch(err){window.alert(normalizeError(err));}
@@ -465,7 +485,42 @@ async function renderProjectList(){
   }catch(e){box.innerHTML=`<div class="project-empty error">${safeEsc(normalizeError(e))}</div>`}
 }
 
-async function loadProject(id){
+// ===== Navigasi bulan pada tab Surat Perintah (di atas pratinjau) =====
+const SHORT_MONTHS=['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function shortMonth(m){return SHORT_MONTHS[m]||getMonthName(m);}
+let navBusy=false;
+async function renderSuratMonthNav(){
+  const box=q('suratMonthNav');if(!box)return;
+  let arr=[];
+  try{arr=sortProjectsByMonth(await getAllProjects());}catch(_){}
+  const chips=arr.map(p=>{
+    const isActive=p.id===activeProjectId;
+    const info=detectMonthFromProject(p);
+    const short=info.month!==999?shortMonth(info.month):projectDisplayName(p);
+    return `<button type="button" class="sv-month-chip${isActive?' active':''}" data-id="${safeEsc(p.id)}" title="${safeEsc(projectDisplayName(p))}" aria-pressed="${isActive}">${safeEsc(short)}</button>`;
+  });
+  const hasRows=Array.isArray(ns.state?.rows)&&ns.state.rows.length>0;
+  if(!activeProjectId&&hasRows){
+    const cur=detectMonthFromProject({state:{rows:ns.state.rows,rawRows:ns.state.rawRows,identity:ns.state.identity},file:ns.state.file,name:''});
+    const label=cur.month!==999?shortMonth(cur.month):'Baru';
+    chips.push(`<span class="sv-month-chip unsaved" title="${safeEsc(autoProjectName()||'BKU baru')} — belum disimpan. Klik SIMPAN PEKERJAAN atau Simpan Data SPMU.">● ${safeEsc(label)}</span>`);
+  }
+  box.innerHTML=`<span class="sv-month-label">📅 Pekerjaan tersimpan</span><div class="sv-month-chips">${chips.length?chips.join(''):'<span class="sv-month-empty">Belum ada pekerjaan tersimpan.</span>'}</div>`;
+  box.querySelectorAll('button[data-id]').forEach(btn=>btn.addEventListener('click',async e=>{
+    const id=e.currentTarget.dataset.id;
+    if(!id||id===activeProjectId||navBusy)return;
+    navBusy=true;box.classList.add('busy');
+    try{
+      ns.readSuratFields?.();
+      await flushIfDirty();
+      await loadProject(id,{tab:'surat'});
+    }catch(err){window.alert(normalizeError(err));}
+    finally{navBusy=false;box.classList.remove('busy');renderSuratMonthNav();}
+  }));
+}
+
+async function loadProject(id,opts){
+  opts=opts||{};
   let p=await getProject(id);
   if(!p)throw new Error('Pekerjaan tidak ditemukan.');
   let blob=p.file?.blob;
@@ -495,91 +550,14 @@ async function loadProject(id){
   ns.render?.();
   if(typeof ns.renderSurat==='function'&&ns.state.rows.length)ns.renderSurat();
   ns.renderTaxes?.();
-  ns.setTab?.(s.activeTab||'bku');
+  const ready=Boolean(ns.state.result&&ns.state.rows.length);
+  if(opts.tab==='surat'&&ready){
+    ns.setTab?.('surat');
+    ns.refreshSuratSuggestions?.();
+    ns.renderSurat?.();
+  }else ns.setTab?.(opts.tab&&opts.tab!=='surat'?opts.tab:(s.activeTab||'bku'));
   markSaved(p,'Supabase Cloud ☁️');
   return p;
-}
-
-async function loadAllProjects(){
-  const all = await getAllProjects();
-  if(!all.length){ window.alert('Belum ada pekerjaan tersimpan.'); return; }
-  const fullProjects = [];
-  for(const item of all){
-    const full = await getProject(item.id);
-    if(full) fullProjects.push(full);
-  }
-  if(!fullProjects.length) throw new Error('Tidak dapat memuat detail pekerjaan.');
-
-  const sorted = sortProjectsByMonth(fullProjects);
-  let combinedRows = [];
-  let combinedRawRows = [];
-  let combinedSuratByBukti = {};
-  let totalBlocks = 0;
-  let totalPages = 0;
-  let sampleBlob = null;
-  let sampleFileType = '';
-  const monthNames = [];
-
-  for(const p of sorted){
-    const s = p.state || {};
-    const pRows = Array.isArray(s.rows) ? s.rows : [];
-    const pRawRows = Array.isArray(s.rawRows) ? s.rawRows : [];
-    const mInfo = detectMonthFromProject(p);
-    monthNames.push(mInfo.monthName);
-
-    pRows.forEach(r => { if(!r.bulanBku) r.bulanBku = mInfo.monthName; });
-    combinedRows = combinedRows.concat(pRows);
-    combinedRawRows = combinedRawRows.concat(pRawRows);
-
-    if(s.suratByBukti && typeof s.suratByBukti === 'object') Object.assign(combinedSuratByBukti, s.suratByBukti);
-    if(s.result?.blocks) totalBlocks += Number(s.result.blocks) || 0;
-    if(s.result?.pages) totalPages += Number(s.result.pages) || 0;
-
-    let b = p.file?.blob;
-    if(!b && p.file?.dataUrl) b = await dataUrlToBlob(p.file.dataUrl, p.file.type);
-    if(b && !sampleBlob){ sampleBlob = b; sampleFileType = p.file?.type || b.type; }
-  }
-
-  const uniqueMonths = monthNames.filter((v, i, a) => a.indexOf(v) === i).join(', ');
-  const baseIdentity = { ...(sorted[0].state?.identity || {}) };
-  baseIdentity.bulan = uniqueMonths;
-  baseIdentity.periode = uniqueMonths;
-
-  const combinedResult = { rows: combinedRows, declaredTotal: null, excludedIncome: null, pages: totalPages || sorted.length, blocks: combinedRows.length };
-  const combinedTitle = `Semua Pekerjaan (${sorted.length} Bulan: ${uniqueMonths})`;
-
-  ns.state.category = '';
-  if(sampleBlob){
-    ns.state.file = new File([sampleBlob], combinedTitle + '.bku', { type: sampleFileType || 'application/octet-stream', lastModified: Date.now() });
-  } else {
-    ns.state.file = new File([new Blob(['BKU Gabungan'])], combinedTitle + '.bku', { type: 'text/plain', lastModified: Date.now() });
-  }
-
-  ns.state.rows = combinedRows;
-  ns.state.rawRows = combinedRawRows;
-  ns.state.result = combinedResult;
-  ns.state.identity = baseIdentity;
-  ns.state.suratByBukti = combinedSuratByBukti;
-  ns.state.search = '';
-
-  activeProjectId = 'all_' + Date.now();
-  activeProjectName = combinedTitle;
-
-  if(q('status')) q('status').textContent = `Berhasil membuka ${sorted.length} pekerjaan berurutan (${uniqueMonths}). Total ${combinedRows.length} transaksi.`;
-  if(q('readBtn')) q('readBtn').disabled = false;
-  if(ns.state.result && ns.state.rows.length){
-    ns.applyIdentityToSurat?.(ns.state.identity || {});
-    ns.syncSurat?.();
-    ns.enableSuratSection?.();
-  }
-  ns.render?.();
-  if(typeof ns.renderSurat === 'function' && ns.state.rows.length) ns.renderSurat();
-  ns.renderTaxes?.();
-  ns.setTab?.('bku');
-  setText('projectSaveName', `Pekerjaan aktif: ${combinedTitle}`);
-  setSaveStatus(`✓ DIBUKA: ${sorted.length} PEKERJAAN BERURUTAN (${uniqueMonths})`, 'ok');
-  closeProjectDialog();
-  return { count: sorted.length, rows: combinedRows.length };
 }
 
 async function makePortableObject(p){
@@ -603,21 +581,12 @@ async function downloadProject(id){
 }
 
 function closeProjectDialog(){const o=q('projectModal');if(o){o.classList.remove('show');o.setAttribute('aria-hidden','true')}}
-function showProjectDialog(mode){
+function showProjectDialog(){
   const overlay=q('projectModal');if(!overlay)return;
-  overlay.dataset.mode=mode||'open';overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');
-  const saveBox=q('projectSaveBox');
+  overlay.dataset.mode='open';overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');
   const title=q('projectModalTitle');const subtitle=q('projectModalSubtitle');
-  if(mode==='save'){
-    title.textContent=activeProjectId?'Simpan Perubahan Pekerjaan':'Simpan Pekerjaan BKU';
-    subtitle.textContent='Klik SIMPAN untuk menulis file BKU + seluruh hasil kerja ke Supabase Cloud.';
-    if(saveBox)saveBox.style.display='block';
-    const input=q('projectNameInput');if(input){input.value=activeProjectName||baseName();input.focus();input.select()}
-  }else{
-    title.textContent='Buka Pekerjaan Tersimpan';
-    subtitle.textContent='Pekerjaan yang tersimpan di Supabase Cloud akan tampil di bawah.';
-    if(saveBox)saveBox.style.display='none';
-  }
+  if(title)title.textContent='Buka Pekerjaan Tersimpan';
+  if(subtitle)subtitle.textContent='Pekerjaan diberi nama otomatis sesuai bulan BKU dan tersimpan di Supabase Cloud.';
   renderProjectList();
 }
 
@@ -626,6 +595,7 @@ function detachActiveProject(){
   if(ns.state)ns.state._projectDirty=false;
   setText('projectSaveName','Pekerjaan baru belum disimpan.');
   setSaveStatus('Pekerjaan baru — belum disimpan.','warn');
+  renderSuratMonthNav();
 }
 
 async function importProjectFile(file){
@@ -636,7 +606,7 @@ async function importProjectFile(file){
   const blob = await dataUrlToBlob(p.file.dataUrl, p.file.type);
   const payload = {
     id: p.id || ('p_' + Date.now()),
-    name: p.name || 'Pekerjaan BKU',
+    name: projectDisplayName({state:p.state,file:p.file,name:p.name}) || 'Pekerjaan BKU',
     createdAt: p.createdAt || Date.now(),
     updatedAt: Date.now(),
     version: 3,
@@ -655,27 +625,22 @@ async function importProjectFile(file){
 async function initProjectStore(){
   const close=q('projectModalClose');if(close)close.addEventListener('click',closeProjectDialog);
   const cancel=q('projectCancelBtn');if(cancel)cancel.addEventListener('click',closeProjectDialog);
-  const saveBtn=q('projectConfirmSaveBtn');
-  if(saveBtn)saveBtn.addEventListener('click',async()=>{
-    const input=q('projectNameInput');
-    try{
-      saveBtn.disabled=true;await putProject(String(input?.value||'').trim()||baseName(),activeProjectId);
-      await renderProjectList();
-      closeProjectDialog();
-    }catch(e){window.alert(normalizeError(e));}
-    finally{saveBtn.disabled=false}
-  });
-  const saveTrigger=q('saveProjectBtn');if(saveTrigger)saveTrigger.addEventListener('click',()=>{
+  const saveTrigger=q('saveProjectBtn');if(saveTrigger)saveTrigger.addEventListener('click',async()=>{
     if(!ns.state?.file){window.alert('Pilih/upload file BKU terlebih dahulu.');return}
-    showProjectDialog('save');
+    try{
+      saveTrigger.disabled=true;
+      const p=await saveCurrentAuto();
+      if(p)setSaveStatus(`✓ TERSIMPAN sebagai "${p.name}" • ${new Date(p.updatedAt).toLocaleTimeString('id-ID')}`,'ok');
+    }catch(e){window.alert(normalizeError(e));}
+    finally{saveTrigger.disabled=false}
   });
-  const openTrigger=q('openProjectBtn');if(openTrigger)openTrigger.addEventListener('click',()=>showProjectDialog('open'));
+  const openTrigger=q('openProjectBtn');if(openTrigger)openTrigger.addEventListener('click',()=>showProjectDialog());
   const overlay=q('projectModal');if(overlay)overlay.addEventListener('click',e=>{if(e.target===overlay)closeProjectDialog()});
     const backupInput = q('projectImportInput');
   if(backupInput) backupInput.addEventListener('change', async e => {
     try {
       await importProjectFile(e.target.files?.[0]);
-      showProjectDialog('open');
+      showProjectDialog();
     } catch(err) {
       window.alert(normalizeError(err));
     } finally {
@@ -686,12 +651,15 @@ async function initProjectStore(){
   if(backupButton) backupButton.addEventListener('click', () => backupInput?.click());
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProjectDialog()});
 
+  q('tabSuratBtn')?.addEventListener('click',()=>renderSuratMonthNav());
   await renderProjectList();
+  renderSuratMonthNav();
   ns.renderDashboard?.();
 }
 
 Object.assign(ns,{
-  initProjectStore,showProjectDialog,closeProjectDialog,loadProject,loadAllProjects,sortProjectsByMonth,detectMonthFromProject,saveCurrentFromUi,saveActiveProject,
+  initProjectStore,showProjectDialog,closeProjectDialog,loadProject,sortProjectsByMonth,detectMonthFromProject,projectDisplayName,autoProjectName,getMonthName,
+  saveCurrentFromUi,saveActiveProjectNow:saveCurrentAuto,saveActiveProject,renderSuratMonthNav,
   markProjectDirty:markDirty,scheduleProjectAutoSave:scheduleAutoSave,
   getActiveProjectId:()=>activeProjectId,getAllProjects,getProject,deleteProject,detachActiveProject
 });

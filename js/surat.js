@@ -207,8 +207,10 @@ async function saveCurrentSuratData(){
   readSuratFields();
   const draft=captureCurrentSuratDraft();
   if(!draft)return false;
-  if(typeof ns.saveActiveProjectNow==='function')await ns.saveActiveProjectNow();
-  else if(typeof ns.saveCurrentFromUi==='function')await ns.saveCurrentFromUi('');
+  let savedProject=true;
+  if(typeof ns.saveActiveProjectNow==='function')savedProject=await ns.saveActiveProjectNow();
+  else if(typeof ns.saveCurrentFromUi==='function')savedProject=await ns.saveCurrentFromUi();
+  if(savedProject===null){updateSuratDraftStatus('Penyimpanan dibatalkan.');return false;}
   updateSuratDraftStatus(`✓ Data No. Bukti ${draft.bukti||'-'} berhasil disimpan.`);
   showSuratSavedPopup(draft);
   return true;
