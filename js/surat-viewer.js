@@ -85,7 +85,7 @@ function printSurat(){
     .surat-page .kop .kop-logo-sekolah{right:0!important;left:auto!important}
     .kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}
     .kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;text-transform:uppercase;word-break:break-word;overflow-wrap:break-word;max-width:100%}
-    .kop .addr,.kop .mail{font-size:8.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
+    .kop .addr,.kop .mail{font-size:7.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
     .paper h2,h2{text-align:center;font-size:15pt;line-height:1.2;margin:7mm 0 1.5mm;text-decoration:underline}
     .nomor{text-align:center;font-size:11pt;line-height:1.2;margin-bottom:8mm}
     .surat-page p{font-size:11pt;line-height:1.45;margin:4mm 0}
@@ -217,7 +217,7 @@ function printBatchSurat(indices,docType='surat'){
     .surat-uraian-table{break-inside:auto;page-break-inside:auto}
     .kop{position:relative;min-height:27mm;padding:0 22mm 3mm;text-align:center;border-bottom:3px double #000;box-sizing:border-box;width:100%;max-width:100%}
     .surat-page .kop .kop-logo{position:absolute;top:1mm;width:18mm;height:18mm;object-fit:contain;display:block}.surat-page .kop .kop-logo-kabupaten{left:0!important;right:auto!important}.surat-page .kop .kop-logo-sekolah{right:0!important;left:auto!important}
-    .kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;text-transform:uppercase;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .kab{font-size:12pt;font-weight:700;line-height:1.15}.kop .addr,.kop .mail{font-size:8.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
+    .kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;text-transform:uppercase;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .kab{font-size:12pt;font-weight:700;line-height:1.15}.kop .addr,.kop .mail{font-size:7.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
     h2{text-align:center;font-size:15pt;line-height:1.2;margin:7mm 0 1.5mm;text-decoration:underline}.nomor{text-align:center;font-size:11pt;line-height:1.2;margin-bottom:8mm}.surat-page p{font-size:11pt;line-height:1.45;margin:4mm 0}
     .identity .line{display:grid;grid-template-columns:42mm 5mm minmax(0,1fr);margin:2.5mm 0;font-size:11pt;line-height:1.35}.identity .line>.colon{text-align:center}
     .payment{margin:0}.payment .row{display:grid;grid-template-columns:52mm 5mm minmax(0,1fr);column-gap:1.5mm;margin:2.6mm 0;font-size:11pt;line-height:1.4;align-items:start}.payment .row>b,.payment .row>.colon{white-space:nowrap}.payment .row>.colon{text-align:center}.payment .row>span:last-child,.payment .row>div:last-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap}.payment-heading{margin:5mm 0 2.5mm!important}.amount{font-weight:700;white-space:nowrap}.terbilang{text-transform:capitalize;font-style:italic}

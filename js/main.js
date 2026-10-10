@@ -19,6 +19,20 @@ function restoreSavedProfile(){
     setProfileLocked(true);return true;
   }catch(e){console.warn('Profil tersimpan tidak dapat dibaca',e);return false;}
 }
+function applySavedProfile(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY)||'null');if(!saved)return false;
+    let any=false;
+    for(const key of profileKeys){
+      const v=String(saved[key]??'').trim();
+      if(!v)continue;
+      state.surat[key]=v;const el=suratElement(key);if(el)el.value=v;any=true;
+    }
+    if(any)setProfileLocked(true);
+    return any&&!!String(saved.alamat??'').trim();
+  }catch(e){return false;}
+}
+ns.applySavedProfile=applySavedProfile;
 restoreSavedProfile();
 $('editProfileBtn')?.addEventListener('click',()=>{setProfileLocked(false);$('suratAlamat')?.focus();});
 $('saveProfileBtn')?.addEventListener('click',()=>{

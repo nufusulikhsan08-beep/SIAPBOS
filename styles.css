@@ -13,7 +13,7 @@
   body.printing-surat #suratPreview .kop .kop-logo-kabupaten{left:0!important;right:auto!important}
   body.printing-surat #suratPreview .kop .kop-logo-sekolah{right:0!important;left:auto!important}
   body.printing-surat #suratPreview .kop{min-height:27mm!important;padding-left:22mm!important;padding-right:22mm!important;padding-bottom:2.5mm!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important}
-  body.printing-surat #suratPreview .kop .addr,body.printing-surat #suratPreview .kop .mail{font-size:8.5pt!important;font-style:italic!important;line-height:1.3!important;word-break:break-word!important;overflow-wrap:break-word!important}
+  body.printing-surat #suratPreview .kop .addr,body.printing-surat #suratPreview .kop .mail{font-size:7.5pt!important;font-style:italic!important;line-height:1.3!important;word-break:break-word!important;overflow-wrap:break-word!important}
   body.printing-surat #suratPreview .kop .prov{font-size:13.5pt!important;line-height:1.15!important;word-break:break-word!important;overflow-wrap:break-word!important}
   body.printing-surat #suratPreview .kop .school{max-width:100%!important;line-height:1.2!important;word-break:break-word!important;overflow-wrap:break-word!important}
 }
@@ -28,7 +28,7 @@
 
 .surat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:11px;font-weight:800;color:#65728b;text-transform:uppercase;letter-spacing:.4px}
 .manual-tag{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;background:#fff3e6;color:#a35b00;font-size:9px;font-weight:900;letter-spacing:.3px;text-transform:uppercase}
-.field input,.field textarea,.field select{width:100%;border:1px solid #dce4f1;border-radius:11px;padding:10px 12px;background:#fbfcff;color:#1d2b49;font:inherit}.field textarea{min-height:70px;resize:vertical}.surat-preview{margin-top:18px;border:1px solid #dfe5ef;border-radius:16px;background:#eef2f7;padding:20px;overflow:auto}.paper{width:794px;min-height:1123px;margin:auto;background:#fff;box-shadow:0 8px 28px #17203318;padding:44px 48px 42px;font-family:Arial,Helvetica,sans-serif;color:#000}.kop{position:relative;min-height:88px;text-align:center;border-bottom:3px double #000;padding:0 70px 8px;box-sizing:border-box;width:100%;max-width:100%}.kop img{position:absolute;left:0;top:0;width:68px;height:70px;object-fit:contain}.kop .prov{font-size:16px;font-weight:700;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:18px;font-weight:700;margin-top:2px;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .addr,.kop .mail{font-size:10px;line-height:1.35;word-break:break-word;overflow-wrap:break-word}.paper h2{text-align:center;font-size:16px;margin:20px 0 4px;text-decoration:underline}.paper .nomor{text-align:center;font-size:12px;margin-bottom:20px}.paper p{font-size:12px;line-height:1.55;margin:8px 0}.identity{margin:14px 0 10px}.identity .line{display:grid;grid-template-columns:145px 12px minmax(0,1fr);margin:5px 0;font-size:12px}.identity .line>span:last-child{min-width:0;overflow-wrap:anywhere;word-break:break-word}.payment{margin-top:12px}.payment .row{display:grid;grid-template-columns:145px 12px minmax(0,1fr);margin:7px 0;font-size:12px;align-items:start}.payment .row>span:last-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap;line-height:1.5}.payment .long-text{text-align:justify}.payment .manual-text{line-height:1.5}.payment .amount{font-weight:700}.payment .terbilang{text-transform:capitalize;font-style:italic}.uraian-list{margin:0;padding:0;list-style:none}.uraian-list .uraian-item{display:grid;grid-template-columns:7mm minmax(0,1fr);column-gap:2mm;margin:1.4mm 0;line-height:1.45;text-align:left}.uraian-list .uraian-no{font-weight:700;text-align:left}.uraian-list .uraian-text{min-width:0;overflow-wrap:anywhere;word-break:break-word}.sign{width:220px;margin-left:auto;text-align:center;margin-top:25px;font-size:12px}.sign img{width:150px;height:100px;object-fit:contain;display:block;margin:2px auto -2px}.sign .name{font-weight:700;text-decoration:underline} .surat-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.field input,.field textarea,.field select{width:100%;border:1px solid #dce4f1;border-radius:11px;padding:10px 12px;background:#fbfcff;color:#1d2b49;font:inherit}.field textarea{min-height:70px;resize:vertical}.surat-preview{margin-top:18px;border:1px solid #dfe5ef;border-radius:16px;background:#eef2f7;padding:20px;overflow:auto}.paper{width:794px;min-height:1123px;margin:auto;background:#fff;box-shadow:0 8px 28px #17203318;padding:44px 48px 42px;font-family:Arial,Helvetica,sans-serif;color:#000}.kop{position:relative;min-height:88px;text-align:center;border-bottom:3px double #000;padding:0 70px 8px;box-sizing:border-box;width:100%;max-width:100%}.kop img{position:absolute;left:0;top:0;width:68px;height:70px;object-fit:contain}.kop .prov{font-size:16px;font-weight:700;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:18px;font-weight:700;margin-top:2px;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .addr,.kop .mail{font-size:7.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word}.paper h2{text-align:center;font-size:16px;margin:20px 0 4px;text-decoration:underline}.paper .nomor{text-align:center;font-size:12px;margin-bottom:20px}.paper p{font-size:12px;line-height:1.55;margin:8px 0}.identity{margin:14px 0 10px}.identity .line{display:grid;grid-template-columns:145px 12px minmax(0,1fr);margin:5px 0;font-size:12px}.identity .line>span:last-child{min-width:0;overflow-wrap:anywhere;word-break:break-word}.payment{margin-top:12px}.payment .row{display:grid;grid-template-columns:145px 12px minmax(0,1fr);margin:7px 0;font-size:12px;align-items:start}.payment .row>span:last-child{min-width:0;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap;line-height:1.5}.payment .long-text{text-align:justify}.payment .manual-text{line-height:1.5}.payment .amount{font-weight:700}.payment .terbilang{text-transform:capitalize;font-style:italic}.uraian-list{margin:0;padding:0;list-style:none}.uraian-list .uraian-item{display:grid;grid-template-columns:7mm minmax(0,1fr);column-gap:2mm;margin:1.4mm 0;line-height:1.45;text-align:left}.uraian-list .uraian-no{font-weight:700;text-align:left}.uraian-list .uraian-text{min-width:0;overflow-wrap:anywhere;word-break:break-word}.sign{width:220px;margin-left:auto;text-align:center;margin-top:25px;font-size:12px}.sign img{width:150px;height:100px;object-fit:contain;display:block;margin:2px auto -2px}.sign .name{font-weight:700;text-decoration:underline} .surat-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .surat-next{min-width:150px}
 .surat-next-info{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:#71809b;font-weight:700}
 .surat-next-info b{color:#3159d9}
@@ -38,7 +38,7 @@
 .paper{position:relative;width:210mm;height:297mm;min-height:297mm;margin:auto;background:#fff;box-shadow:0 8px 28px #17203318;padding:8mm 15mm 48mm;font-family:Arial,Helvetica,sans-serif;color:#000;overflow:hidden;box-sizing:border-box;break-inside:avoid;page-break-inside:avoid}
 .kop{min-height:27mm;padding:0 22mm 2.5mm;text-align:center;border-bottom:3px double #000;box-sizing:border-box;width:100%;max-width:100%}
 .kop img{left:0;top:1mm;width:18mm;height:18mm}
-.kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .addr,.kop .mail{font-size:8.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word}
+.kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}.kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;word-break:break-word;overflow-wrap:break-word;max-width:100%}.kop .addr,.kop .mail{font-size:7.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word}
 .sign{position:absolute;right:15mm;bottom:10mm;width:62mm;margin:0;text-align:center;font-size:12px;z-index:5}
 .sign img{width:48mm;height:27mm;object-fit:contain;display:block;margin:2px auto -2px}
 @media screen and (max-width:900px){.paper{margin:0;width:210mm;height:297mm;min-height:297mm;transform-origin:top left}}
@@ -85,7 +85,7 @@
 .kop .prov{font-size:13.5pt;line-height:1.15;font-weight:700;word-break:break-word;overflow-wrap:break-word}
 .kop .school{font-size:14pt;line-height:1.2;font-weight:700;margin-top:1mm;word-break:break-word;overflow-wrap:break-word;max-width:100%}
 .kop .kab{font-size:12pt;line-height:1.15;font-weight:700;margin-top:.5mm}
-.kop .addr,.kop .mail{font-size:8.5pt!important;line-height:1.3;font-weight:400;word-break:break-word;overflow-wrap:break-word;max-width:100%}
+.kop .addr,.kop .mail{font-size:7.5pt!important;line-height:1.3;font-weight:400;word-break:break-word;overflow-wrap:break-word;max-width:100%}
 .kop .addr{margin-top:1.5mm}.kop .mail{margin-top:.5mm}
 .paper h2{text-align:center;font-size:12pt;line-height:1.2;margin:6mm 0 1.5mm;text-decoration:underline;font-weight:700}
 .paper .nomor{text-align:center;font-size:12pt;line-height:1.2;margin-bottom:6mm}
@@ -110,7 +110,7 @@
 }
 
 .kop .school{text-transform:uppercase}
-.kop .addr,.kop .mail{font-size:9pt!important;font-style:italic!important}.kop .addr,.kop .mail{font-weight:400}
+.kop .addr,.kop .mail{font-size:7.5pt!important;font-style:italic!important}.kop .addr,.kop .mail{font-weight:400}
 .sign{position:static!important;width:62mm;margin:14mm 0 0 auto!important;text-align:center}
 .page-footer{display:none}
 @media print{
@@ -188,7 +188,7 @@
 .surat-page .kop .prov{font-size:13.5pt;font-weight:700;line-height:1.15;word-break:break-word;overflow-wrap:break-word}
 .surat-page .kop .school{font-size:14pt;font-weight:700;line-height:1.2;margin-top:2px;text-transform:uppercase;word-break:break-word;overflow-wrap:break-word;max-width:100%}
 .surat-page .kop .kab{font-size:12pt;font-weight:700;line-height:1.15}
-.surat-page .kop .addr,.surat-page .kop .mail{font-size:8.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
+.surat-page .kop .addr,.surat-page .kop .mail{font-size:7.5pt;line-height:1.35;word-break:break-word;overflow-wrap:break-word;max-width:100%}
 .surat-page h2{text-align:center;font-size:15pt;line-height:1.2;margin:7mm 0 1.5mm;text-decoration:underline}
 .surat-page .nomor{text-align:center;font-size:11pt;line-height:1.2;margin-bottom:8mm}
 .surat-page p{font-size:11pt;line-height:1.45;margin:4mm 0}

@@ -483,9 +483,12 @@ function buildSuratBlocks(d, num, dateText, tandaTangan, logoSekolah, logoKabupa
   const schoolLogo=clean(logoSekolah)?`<img class="kop-logo kop-logo-sekolah" src="${esc(logoSekolah)}" alt="Logo Sekolah">`:'';
   const rawSchool=[d.sd,d.kecamatan].filter(Boolean).join(' ').replace(/\s+/g,' ').toLocaleUpperCase('id-ID')||'SD NEGERI';
   const schoolFontSize=getKopSchoolFontSize(rawSchool);
-  const provText = d.kabupaten ? ('PEMERINTAH ' + clean(d.kabupaten).toUpperCase()) : 'PEMERINTAH DAERAH';
+  const rawKab=clean(d.kabupaten||state.identity?.kabupaten||'');
+  const isKota=/^kota\b/i.test(rawKab);
+  const kabupatenBku=rawKab.replace(/^(?:kabupaten|kab\.?|kota)\s+/i,'').trim();
+  const provText='PEMERINTAH '+(isKota?'KOTA':'KABUPATEN')+(kabupatenBku?' '+kabupatenBku.toLocaleUpperCase('id-ID'):'');
   const introKec = d.kecamatan ? `Kecamatan ${esc(d.kecamatan)} ` : '';
-  const introKab = d.kabupaten ? `${esc(d.kabupaten)} ` : '';
+  const introKab = rawKab ? `${esc(rawKab)} ` : '';
   blocks.push(suratBlock(`<div class="kop"><img class="kop-logo kop-logo-kabupaten" src="${esc(kabSrc)}" alt="Logo Daerah">${schoolLogo}<div class="prov">${esc(provText)}</div><div class="school" style="font-size:${schoolFontSize};">${esc(rawSchool)}</div><div class="addr">Alamat : ${esc(d.alamat||'')}</div><div class="mail">E-Mail : ${esc(d.email||'')} &nbsp;&nbsp; NPSN: ${esc(d.npsn||'')} &nbsp;&nbsp; NSS: ${esc(d.nss||'')}</div></div>`,'kop-block'));
   blocks.push(suratBlock(`<h2>SURAT PERINTAH MENGELUARKAN UANG</h2><div class="nomor">Nomor : ${esc(num)}</div>`,'title-block'));
   blocks.push(suratBlock(`<p>Kepala ${esc(d.sd||'SD')} ${introKec}${introKab}memerintahkan kepada:</p>`,'intro-block'));

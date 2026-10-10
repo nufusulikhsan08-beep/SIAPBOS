@@ -337,8 +337,9 @@ function applyIdentityToSurat(identity){
   state.identity=id;
   const map={sd:id.school,kecamatan:id.kecamatan,npsn:id.npsn,bendahara:id.treasurerName,nipBendahara:id.treasurerNip,kepala:id.headName,nipKepala:id.headNip};
   for(const [key,value] of Object.entries(map)){state.surat[key]=value||'';const el=suratElement(key);if(el)el.value=value||'';}
-  const savedProfile=(()=>{try{return JSON.parse(localStorage.getItem('siapbos_profile_surat_kontak_v1')||'null')}catch(_){return null}})();
-  if(!savedProfile){state.surat.alamat=id.alamat||'';const addressEl=suratElement('alamat');if(addressEl)addressEl.value=id.alamat||'';}
+  // Profil tersimpan (alamat/email/NSS/nomor) dipakai untuk semua BKU; alamat BKU hanya jadi cadangan bila profil belum punya alamat.
+  const hasSavedAddress=!!ns.applySavedProfile?.();
+  if(!hasSavedAddress){state.surat.alamat=id.alamat||'';const addressEl=suratElement('alamat');if(addressEl)addressEl.value=id.alamat||'';}
   const required=[['Nama Sekolah',id.school],['Alamat',id.alamat],['Kepala Sekolah',id.headName],['NIP Kepala Sekolah',id.headNip],['Bendahara',id.treasurerName],['NIP Bendahara',id.treasurerNip]];
   const missing=required.filter(([,v])=>!clean(v)).map(([k])=>k);
   $('identityStatus').className='auto-status '+(missing.length?'auto-status-warn':'auto-status-ok');

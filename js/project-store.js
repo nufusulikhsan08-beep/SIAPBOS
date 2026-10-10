@@ -534,6 +534,7 @@ async function loadProject(id,opts){
   ns.state.result=s.result||null;
   ns.state.identity=s.identity||{school:'',kecamatan:'',alamat:'',npsn:'',headName:'',headNip:'',treasurerName:'',treasurerNip:'',kabupaten:'',provinsi:''};
   ns.state.surat={...(ns.state.surat||{}),...(s.surat||{})};
+  ns.applySavedProfile?.();
   ns.state.suratByBukti=(s.suratByBukti&&typeof s.suratByBukti==='object'&&!Array.isArray(s.suratByBukti))?s.suratByBukti:{};
   ns.state.search=String(s.search||'');
   activeProjectId=p.id;activeProjectName=p.name||'';
